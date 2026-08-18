@@ -10,6 +10,8 @@ dependencies:
   flutter:
     sdk: flutter
   
+  hijri: ^3.0.0
+
   # State Management
   flutter_riverpod: ^2.4.9
   
