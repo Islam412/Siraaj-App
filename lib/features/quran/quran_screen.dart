@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:just_audio/just_audio.dart';
-import 'dart:math';
 
 class QuranScreen extends StatefulWidget {
   const QuranScreen({super.key});
@@ -63,7 +62,16 @@ class _QuranScreenState extends State<QuranScreen> {
     {'number': 1, 'name': 'الفاتحة', 'englishName': 'Al-Fatiha', 'verses': 7, 'type': 'Meccan'},
     {'number': 2, 'name': 'البقرة', 'englishName': 'Al-Baqara', 'verses': 286, 'type': 'Medinan'},
     {'number': 3, 'name': 'آل عمران', 'englishName': 'Ali Imran', 'verses': 200, 'type': 'Medinan'},
-    // ... بقية السور
+    {'number': 4, 'name': 'النساء', 'englishName': 'An-Nisa', 'verses': 176, 'type': 'Medinan'},
+    {'number': 5, 'name': 'المائدة', 'englishName': 'Al-Maidah', 'verses': 120, 'type': 'Medinan'},
+    {'number': 6, 'name': 'الأنعام', 'englishName': 'Al-Anam', 'verses': 165, 'type': 'Meccan'},
+    {'number': 7, 'name': 'الأعراف', 'englishName': 'Al-Araf', 'verses': 206, 'type': 'Meccan'},
+    {'number': 8, 'name': 'الأنفال', 'englishName': 'Al-Anfal', 'verses': 75, 'type': 'Medinan'},
+    {'number': 9, 'name': 'التوبة', 'englishName': 'At-Tawbah', 'verses': 129, 'type': 'Medinan'},
+    {'number': 10, 'name': 'يونس', 'englishName': 'Yunus', 'verses': 109, 'type': 'Meccan'},
+    {'number': 112, 'name': 'الإخلاص', 'englishName': 'Al-Ikhlas', 'verses': 4, 'type': 'Meccan'},
+    {'number': 113, 'name': 'الفلق', 'englishName': 'Al-Falaq', 'verses': 5, 'type': 'Meccan'},
+    {'number': 114, 'name': 'الناس', 'englishName': 'An-Nas', 'verses': 6, 'type': 'Meccan'},
   ];
 
   @override
@@ -300,7 +308,6 @@ class _QuranScreenState extends State<QuranScreen> {
           ),
           child: Row(
             children: [
-              // Surah Number Badge
               Container(
                 margin: const EdgeInsets.all(8),
                 padding: const EdgeInsets.all(8),
@@ -353,8 +360,6 @@ class _QuranScreenState extends State<QuranScreen> {
   }
 
   bool _isSurahCompleted(int surahNumber) {
-    // منطق بسيط للتحقق من إتمام السورة
-    // يمكن تطويره لاحقاً
     return false;
   }
 
@@ -451,7 +456,9 @@ class _QuranScreenState extends State<QuranScreen> {
   }
 }
 
-// شاشة قراءة السورة
+// ==========================================
+// شاشة قراءة السورة (Mushaf Layout)
+// ==========================================
 class SurahReadingScreen extends StatefulWidget {
   final Map<String, dynamic> surah;
   final Map<String, String> reciter;
@@ -459,9 +466,9 @@ class SurahReadingScreen extends StatefulWidget {
   final int fontSize;
   final bool showTafsir;
   final int selectedTafsir;
-  final Function onTafsirToggle;
+  final void Function() onTafsirToggle;
   final Map<int, bool> completedAyahs;
-  final Function(int) onAyahComplete;
+  final void Function(int) onAyahComplete;
 
   const SurahReadingScreen({
     super.key,
@@ -483,7 +490,6 @@ class SurahReadingScreen extends StatefulWidget {
 class _SurahReadingScreenState extends State<SurahReadingScreen> {
   final AudioPlayer _audioPlayer = AudioPlayer();
   bool _isPlaying = false;
-  int? _currentAyah;
 
   @override
   void dispose() {
@@ -509,7 +515,7 @@ class _SurahReadingScreenState extends State<SurahReadingScreen> {
       ),
       body: Column(
         children: [
-          // Audio Controls
+          // Audio Controls Bar
           if (_isPlaying)
             Container(
               padding: const EdgeInsets.all(12),
@@ -518,8 +524,12 @@ class _SurahReadingScreenState extends State<SurahReadingScreen> {
                 children: [
                   const Icon(Icons.queue_music),
                   const SizedBox(width: 8),
-                  Text('يُتلى الآن: ${widget.reciter['name']}'),
-                  const Spacer(),
+                  Expanded(
+                    child: Text(
+                      'يُتلى الآن: ${widget.reciter['name']} (${widget.qiraat == 0 ? 'حفص' : 'ورش'})',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
                   IconButton(
                     icon: const Icon(Icons.stop),
                     onPressed: _toggleAudio,
@@ -531,9 +541,9 @@ class _SurahReadingScreenState extends State<SurahReadingScreen> {
           Expanded(
             child: Row(
               children: [
-                // Quran Text - Two Pages Layout
+                // Quran Text - Mushaf Layout
                 Expanded(
-                  flex: 2,
+                  flex: widget.showTafsir ? 1 : 2,
                   child: _buildMushafPages(),
                 ),
                 
@@ -559,111 +569,148 @@ class _SurahReadingScreenState extends State<SurahReadingScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: widget.onTafsirToggle,
+        backgroundColor: Theme.of(context).colorScheme.primary,
         child: Icon(widget.showTafsir ? Icons.visibility_off : Icons.visibility),
       ),
     );
   }
 
   Widget _buildMushafPages() {
+    // عينة من نص سورة الفاتحة بالرسم العثماني للتجربة
+    final sampleAyahs = [
+      'بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ',
+      'ٱلْحَمْدُ لِلَّهِ رَبِّ ٱلْعَٰلَمِينَ',
+      'ٱلرَّحْمَٰنِ ٱلرَّحِيمِ',
+      'مَٰلِكِ يَوْمِ ٱلدِّينِ',
+      'إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ',
+      'ٱهْدِنَا ٱلصِّرَٰطَ ٱلْمُسْتَقِيمَ',
+      'صِرَٰطَ ٱلَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ ٱلْمَغْضُوبِ عَلَيْهِمْ وَلَا ٱلضَّآلِّينَ',
+    ];
+
     return SingleChildScrollView(
-      child: Column(
-        children: [
-          // Basmala
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Text(
-              'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ',
-              style: TextStyle(
-                fontSize: widget.fontSize.toDouble() + 8,
-                fontFamily: 'Amiri',
-                fontWeight: FontWeight.bold,
+      child: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          children: [
+            // Surah Header
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              decoration: BoxDecoration(
+                border: Border.all(color: Theme.of(context).colorScheme.primary.withOpacity(0.3), width: 2),
+                borderRadius: BorderRadius.circular(12),
+                color: Theme.of(context).colorScheme.primary.withOpacity(0.05),
               ),
-              textAlign: TextAlign.center,
+              child: Column(
+                children: [
+                  Text(
+                    'سورة ${widget.surah['name']}',
+                    style: TextStyle(
+                      fontSize: 28,
+                      fontFamily: 'Amiri',
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    '${widget.surah['type'] == 'Meccan' ? 'مكية' : 'مدنية'} • ${widget.surah['verses']} آية',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontFamily: 'Amiri',
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-          
-          // Ayahs
-          ...List.generate(widget.surah['verses'], (index) {
-            final ayahNumber = index + 1;
-            final isCompleted = widget.completedAyahs[ayahNumber] ?? false;
+            const SizedBox(height: 32),
             
-            return _buildAyahCard(ayahNumber, isCompleted);
-          }),
-        ],
+            // Basmala (if not At-Tawbah)
+            if (widget.surah['number'] != 9)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 24),
+                child: Text(
+                  'بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ',
+                  style: TextStyle(
+                    fontSize: widget.fontSize.toDouble() + 4,
+                    fontFamily: 'Amiri',
+                    color: Theme.of(context).colorScheme.primary,
+                    height: 2,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            
+            // Mushaf Text Block
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                // خلفية رق قديمة مريحة للعين في الوضع الفاتح
+                color: Theme.of(context).brightness == Brightness.dark 
+                    ? const Color(0xFF1A2942) 
+                    : const Color(0xFFFFFBF0), 
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+                ),
+              ),
+              child: Text(
+                // دمج الآيات مع علامة زخرفية وأرقام عربية
+                sampleAyahs.asMap().entries.map((entry) {
+                  final index = entry.key + 1;
+                  final text = entry.value;
+                  final isCompleted = widget.completedAyahs[index] ?? false;
+                  return '${text} ۝${_toArabicNumerals(index)}${isCompleted ? ' ✅' : ''}  ';
+                }).join(' '),
+                style: TextStyle(
+                  fontSize: widget.fontSize.toDouble(),
+                  fontFamily: 'Amiri',
+                  height: 2.8, // تباعد أسطر واسع لراحة العين
+                  color: Theme.of(context).brightness == Brightness.dark 
+                      ? const Color(0xFFF0E8D8) 
+                      : const Color(0xFF1A1A1A),
+                ),
+                textAlign: TextAlign.justify,
+                textDirection: TextDirection.rtl,
+              ),
+            ),
+            
+            const SizedBox(height: 32),
+            
+            // Navigation buttons
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton.icon(
+                  onPressed: () {}, 
+                  icon: const Icon(Icons.arrow_forward),
+                  label: const Text('السابقة'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme.of(context).colorScheme.surface,
+                    foregroundColor: Theme.of(context).colorScheme.onSurface,
+                  ),
+                ),
+                ElevatedButton.icon(
+                  onPressed: () {}, 
+                  icon: const Icon(Icons.arrow_back),
+                  label: const Text('التالية'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    foregroundColor: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildAyahCard(int ayahNumber, bool isCompleted) {
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      color: isCompleted 
-          ? Colors.green.withOpacity(0.1)
-          : null,
-      child: InkWell(
-        onTap: () => _handleAyahTap(ayahNumber),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              // Ayah Text (Placeholder - should fetch from API)
-              Text(
-                'نص الآية $ayahNumber من سورة ${widget.surah['name']}',
-                style: TextStyle(
-                  fontSize: widget.fontSize.toDouble(),
-                  fontFamily: 'Amiri',
-                  height: 2.5,
-                ),
-                textAlign: TextAlign.right,
-              ),
-              const SizedBox(height: 12),
-              // Ayah Number
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    width: 36,
-                    height: 36,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Theme.of(context).colorScheme.primary),
-                    ),
-                    child: Center(
-                      child: Text(
-                        '$ayahNumber',
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.primary,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                  if (isCompleted)
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: Colors.green,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: const Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.check, size: 16, color: Colors.white),
-                          SizedBox(width: 4),
-                          Text(
-                            'تم الحفظ',
-                            style: TextStyle(color: Colors.white, fontSize: 12),
-                          ),
-                        ],
-                      ),
-                    ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+  String _toArabicNumerals(int number) {
+    const arabicNumbers = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+    return number.toString().split('').map((e) => arabicNumbers[int.parse(e)]).join('');
   }
 
   Widget _buildTafsirPanel() {
@@ -674,15 +721,16 @@ class _SurahReadingScreenState extends State<SurahReadingScreen> {
         children: [
           Row(
             children: [
-              Text(
-                widget.selectedTafsir == 0 
-                    ? 'التفسير الميسر'
-                    : widget.selectedTafsir == 1
-                        ? 'تفسير الجلالين'
-                        : 'تفسير السعدي',
-                style: const TextStyle(fontWeight: FontWeight.bold),
+              Expanded(
+                child: Text(
+                  widget.selectedTafsir == 0 
+                      ? 'التفسير الميسر'
+                      : widget.selectedTafsir == 1
+                          ? 'تفسير الجلالين'
+                          : 'تفسير السعدي',
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                ),
               ),
-              const Spacer(),
               IconButton(
                 icon: const Icon(Icons.close),
                 onPressed: widget.onTafsirToggle,
@@ -693,13 +741,14 @@ class _SurahReadingScreenState extends State<SurahReadingScreen> {
           Expanded(
             child: SingleChildScrollView(
               child: Text(
-                'هنا سيتم عرض التفسير للآية المحددة. هذا النص توضيحي فقط.',
+                'هنا سيتم عرض التفسير للآية المحددة. هذا النص توضيحي فقط. في النسخة النهائية، سيتم جلب التفسير من قاعدة البيانات المحلية أو API.',
                 style: TextStyle(
-                  fontSize: 16,
-                  height: 1.8,
-                  fontFamily: 'Tajawal',
+                  fontSize: 18,
+                  height: 2.0,
+                  fontFamily: 'Amiri',
                 ),
-                textAlign: TextAlign.right,
+                textAlign: TextAlign.justify,
+                textDirection: TextDirection.rtl,
               ),
             ),
           ),
@@ -710,7 +759,6 @@ class _SurahReadingScreenState extends State<SurahReadingScreen> {
 
   void _handleAyahTap(int ayahNumber) {
     widget.onAyahComplete(ayahNumber);
-    // Play audio if enabled
     if (_isPlaying) {
       _playAyah(ayahNumber);
     }
@@ -720,11 +768,10 @@ class _SurahReadingScreenState extends State<SurahReadingScreen> {
     setState(() {
       _isPlaying = !_isPlaying;
     });
-    // Implement audio playback logic here
   }
 
   void _playAyah(int ayahNumber) {
-    // Implement audio playback for specific ayah
+    // سيتم ربط هذا بتشغيل الصوت الفعلي لاحقاً
   }
 
   void _bookmarkAyah() {
