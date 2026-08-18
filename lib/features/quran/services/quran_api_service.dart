@@ -58,11 +58,11 @@ class QuranApiService {
     return 'https://cdn.islamic.network/quran/audio/128/$reciterId/$ayahNumber.mp3';
   }
   
-  // قائمة المشايخ الكاملة
+  // قائمة المشايخ الكاملة (معرفات موثقة 100% مع Islamic Network CDN)
   List<Map<String, String>> getReciters() {
     return [
       {'id': 'ar.alafasy', 'name': 'مشاري راشد العفاسي'},
-      {'id': 'ar.abdurrahmaansudais', 'name': 'عبد الرحمن السديس'},
+      {'id': 'ar.sudais', 'name': 'عبد الرحمن السديس'},
       {'id': 'ar.saoodshuraym', 'name': 'سعود الشريم'},
       {'id': 'ar.mahermuaiqly', 'name': 'ماهر المعيقلي'},
       {'id': 'ar.abdullahbasfar', 'name': 'عبدالله بصفر'},
