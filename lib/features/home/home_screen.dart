@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:go_router/go_router.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class HomeScreen extends StatelessWidget {
   final void Function(Locale)? onLocaleChanged;
@@ -15,6 +16,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final theme = Theme.of(context);
     
     return Scaffold(
       appBar: AppBar(
@@ -32,7 +34,7 @@ class HomeScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Top Banner
+            // Top Banner - Next Prayer
             _buildTopBanner(context),
             const SizedBox(height: 24),
             
@@ -47,115 +49,211 @@ class HomeScreen extends StatelessWidget {
               children: [
                 _buildFeatureCard(
                   context,
-                  icon: Icons.menu_book,
+                  iconPath: 'assets/icons/quran.svg',
                   title: 'القرآن',
                   subtitle: 'Quran',
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [Color(0xFF1565A8), Color(0xFF2180CC)],
+                  ),
                   onTap: () => context.push('/quran'),
                   delay: 0,
                 ),
                 _buildFeatureCard(
                   context,
-                  icon: Icons.explore,
+                  iconPath: 'assets/icons/qibla.svg',
                   title: 'القبلة',
                   subtitle: 'Qibla',
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [Color(0xFF0D47A1), Color(0xFF1565A8)],
+                  ),
                   onTap: () => context.push('/qibla'),
                   delay: 100,
                 ),
                 _buildFeatureCard(
                   context,
-                  icon: Icons.access_time,
+                  iconPath: 'assets/icons/prayer.svg',
                   title: 'أوقات الصلاة',
                   subtitle: 'Prayer Times',
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [Color(0xFFB8922A), Color(0xFFD4AC4E)],
+                  ),
                   onTap: () => context.push('/prayer'),
                   delay: 200,
                 ),
                 _buildFeatureCard(
                   context,
-                  icon: Icons.calendar_today,
+                  iconPath: 'assets/icons/muhasaba.svg',
                   title: 'محاسبة النفس',
                   subtitle: 'Muhasaba',
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [Color(0xFF10B981), Color(0xFF34D399)],
+                  ),
                   onTap: () => context.push('/muhasaba'),
                   delay: 300,
                 ),
                 _buildFeatureCard(
                   context,
-                  icon: Icons.fiber_manual_record,
+                  iconPath: 'assets/icons/tasbih.svg',
                   title: 'المسبحة',
                   subtitle: 'Tasbih',
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [Color(0xFF8B5CF6), Color(0xFFA78BFA)],
+                  ),
                   onTap: () => context.push('/tasbih'),
                   delay: 400,
                 ),
                 _buildFeatureCard(
                   context,
-                  icon: Icons.alarm,
+                  iconPath: 'assets/icons/azkar.svg',
                   title: 'أذكار اليوم',
                   subtitle: 'Daily Azkar',
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [Color(0xFFF59E0B), Color(0xFFFBBF24)],
+                  ),
                   onTap: () => context.push('/azkar'),
                   delay: 500,
                 ),
                 _buildFeatureCard(
                   context,
-                  icon: Icons.shield,
-                  title: 'حصون المسلم',
-                  subtitle: 'Hisn Al-Muslim',
-                  onTap: () => context.push('/azkar'), // Same screen, different filter
+                  iconPath: 'assets/icons/hadith.svg',
+                  title: 'الأحاديث',
+                  subtitle: 'Hadith',
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [Color(0xFFEF4444), Color(0xFFF87171)],
+                  ),
+                  onTap: () => context.push('/hadith'),
                   delay: 600,
                 ),
                 _buildFeatureCard(
                   context,
-                  icon: Icons.book,
-                  title: 'الأحاديث',
-                  subtitle: 'Hadith',
-                  onTap: () => context.push('/hadith'),
+                  iconPath: 'assets/icons/radio.svg',
+                  title: 'الإذاعة',
+                  subtitle: 'Radio',
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [Color(0xFF06B6D4), Color(0xFF22D3EE)],
+                  ),
+                  onTap: () => context.push('/radio'),
                   delay: 700,
                 ),
                 _buildFeatureCard(
                   context,
-                  icon: Icons.podcasts,
+                  iconPath: 'assets/icons/podcast.svg',
                   title: 'البودكاست',
                   subtitle: 'Podcast',
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [Color(0xFFEC4899), Color(0xFFF472B6)],
+                  ),
                   onTap: () => context.push('/podcast'),
                   delay: 800,
                 ),
                 _buildFeatureCard(
                   context,
-                  icon: Icons.video_library,
+                  iconPath: 'assets/icons/lectures.svg',
                   title: 'المحاضرات',
                   subtitle: 'Lectures',
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [Color(0xFF14B8A6), Color(0xFF2DD4BF)],
+                  ),
                   onTap: () => context.push('/lectures'),
                   delay: 900,
                 ),
                 _buildFeatureCard(
                   context,
-                  icon: Icons.library_books,
+                  iconPath: 'assets/icons/books.svg',
                   title: 'الكتب',
                   subtitle: 'Books',
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [Color(0xFF8B6914), Color(0xFFB8922A)],
+                  ),
                   onTap: () => context.push('/books'),
                   delay: 1000,
                 ),
                 _buildFeatureCard(
                   context,
-                  icon: Icons.radio,
-                  title: 'الإذاعة',
-                  subtitle: 'Radio',
-                  onTap: () => context.push('/radio'),
+                  iconPath: 'assets/icons/asma_allah.svg',
+                  title: 'أسماء الله',
+                  subtitle: '99 Names',
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [Color(0xFF6366F1), Color(0xFF818CF8)],
+                  ),
+                  onTap: () => context.push('/asma-allah'),
                   delay: 1100,
                 ),
                 _buildFeatureCard(
                   context,
-                  icon: Icons.contact_mail,
-                  title: 'تواصل معنا',
-                  subtitle: 'Contact',
-                  onTap: () => context.push('/contact'),
+                  iconPath: 'assets/icons/zakat.svg',
+                  title: 'حاسبة الزكاة',
+                  subtitle: 'Zakat',
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [Color(0xFF10B981), Color(0xFF34D399)],
+                  ),
+                  onTap: () => context.push('/zakat'),
                   delay: 1200,
                 ),
                 _buildFeatureCard(
                   context,
-                  icon: Icons.emoji_events,
-                  title: 'إنجاز اليوم',
-                  subtitle: 'Today\'s Achievement',
-                  onTap: () => context.push('/muhasaba'),
+                  iconPath: 'assets/icons/calendar.svg',
+                  title: 'التقويم الهجري',
+                  subtitle: 'Hijri Calendar',
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [Color(0xFFF97316), Color(0xFFFB923C)],
+                  ),
+                  onTap: () => context.push('/calendar'),
                   delay: 1300,
+                ),
+                _buildFeatureCard(
+                  context,
+                  iconPath: 'assets/icons/stories.svg',
+                  title: 'قصص الأنبياء',
+                  subtitle: 'Stories',
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [Color(0xFF8B5CF6), Color(0xFFA78BFA)],
+                  ),
+                  onTap: () => context.push('/stories'),
+                  delay: 1400,
+                ),
+                _buildFeatureCard(
+                  context,
+                  iconPath: 'assets/icons/duas.svg',
+                  title: 'أدعية مختارة',
+                  subtitle: 'Duas',
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [Color(0xFFEC4899), Color(0xFFF472B6)],
+                  ),
+                  onTap: () => context.push('/duas'),
+                  delay: 1500,
                 ),
               ],
             ),
@@ -166,34 +264,53 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget _buildTopBanner(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            Theme.of(context).colorScheme.primary,
-            Theme.of(context).colorScheme.primary.withOpacity(0.7),
-          ],
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF1565A8), Color(0xFF2180CC)],
         ),
         borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF1565A8).withOpacity(0.3),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'الصلاة التالية',
-            style: TextStyle(
-              color: Colors.white70,
-              fontSize: 14,
-            ),
+          Row(
+            children: [
+              const Icon(
+                Icons.access_time,
+                color: Colors.white70,
+                size: 20,
+              ),
+              const SizedBox(width: 8),
+              const Text(
+                'الصلاة التالية',
+                style: TextStyle(
+                  color: Colors.white70,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
           const Text(
             'الظهر',
             style: TextStyle(
               color: Colors.white,
-              fontSize: 28,
+              fontSize: 32,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -203,6 +320,7 @@ class HomeScreen extends StatelessWidget {
             style: TextStyle(
               color: Colors.white.withOpacity(0.9),
               fontSize: 18,
+              fontWeight: FontWeight.w500,
             ),
           ),
         ],
@@ -212,9 +330,10 @@ class HomeScreen extends StatelessWidget {
 
   Widget _buildFeatureCard(
     BuildContext context, {
-    required IconData icon,
+    required String iconPath,
     required String title,
     required String subtitle,
+    required LinearGradient gradient,
     required VoidCallback onTap,
     required int delay,
   }) {
@@ -222,35 +341,51 @@ class HomeScreen extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(16),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                icon,
-                size: 40,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-              const SizedBox(height: 12),
-              Text(
-                title,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            gradient: gradient,
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  width: 56,
+                  height: 56,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: SvgPicture.asset(
+                    iconPath,
+                    width: 32,
+                    height: 32,
+                    color: Colors.white,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                subtitle,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 11,
-                  color: Colors.grey[600],
+                const SizedBox(height: 12),
+                Text(
+                  title,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
                 ),
-              ),
-            ],
+                const SizedBox(height: 4),
+                Text(
+                  subtitle,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: Colors.white.withOpacity(0.8),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -263,8 +398,12 @@ class HomeScreen extends StatelessWidget {
         padding: EdgeInsets.zero,
         children: [
           DrawerHeader(
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primary,
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [Color(0xFF1565A8), Color(0xFF2180CC)],
+              ),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -342,7 +481,6 @@ class HomeScreen extends StatelessWidget {
               title: const Text('اللغة'),
               subtitle: const Text('العربية / English'),
               onTap: () {
-                // Toggle language
                 Navigator.pop(context);
               },
             ),
