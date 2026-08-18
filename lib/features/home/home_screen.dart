@@ -79,7 +79,7 @@ class HomeScreen extends StatelessWidget {
                 ),
                 _buildFeatureCard(
                   context,
-                  icon: Icons.counter_1,
+                  icon: Icons.fiber_manual_record,
                   title: 'المسبحة',
                   subtitle: 'Tasbih',
                   onTap: () => context.push('/tasbih'),

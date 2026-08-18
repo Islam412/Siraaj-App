@@ -2,19 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
-  // Colors
   static const Color primaryBlue = Color(0xFF1565A8);
   static const Color primaryBlueLight = Color(0xFF2180CC);
   static const Color gold = Color(0xFFB8922A);
   static const Color goldLight = Color(0xFFD4AC4E);
   
-  // Light Mode
   static const Color lightBackground = Color(0xFFF5F6F8);
   static const Color lightCard = Color(0xFFFFFFFF);
   static const Color lightText = Color(0xFF1A1A1A);
   static const Color lightTextSecondary = Color(0xFF6B7280);
   
-  // Dark Mode
   static const Color darkBackground = Color(0xFF0B1623);
   static const Color darkCard = Color(0xFF132033);
   static const Color darkText = Color(0xFFF0E8D8);
@@ -41,7 +38,7 @@ class AppTheme {
         color: Colors.white,
       ),
     ),
-    cardTheme: CardTheme(
+    cardTheme: CardThemeData(
       color: lightCard,
       elevation: 2,
       shape: RoundedRectangleBorder(
@@ -89,7 +86,7 @@ class AppTheme {
         color: darkText,
       ),
     ),
-    cardTheme: CardTheme(
+    cardTheme: CardThemeData(
       color: darkCard,
       elevation: 2,
       shape: RoundedRectangleBorder(

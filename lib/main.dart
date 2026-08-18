@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'core/theme/app_theme.dart';
-import 'core/router/app_router.dart';
 import 'features/home/home_screen.dart';
 
 void main() async {
@@ -28,16 +27,14 @@ class _SiraajAppState extends ConsumerState<SiraajApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
+    return MaterialApp(
       title: 'سراج',
       debugShowCheckedModeBanner: false,
       
-      // Theme
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: _themeMode,
       
-      // Localization
       locale: _locale,
       supportedLocales: const [
         Locale('ar'),
@@ -49,10 +46,6 @@ class _SiraajAppState extends ConsumerState<SiraajApp> {
         GlobalCupertinoLocalizations.delegate,
       ],
       
-      // Router
-      routerConfig: AppRouter.router,
-      
-      // Home Screen
       home: HomeScreen(
         onLocaleChanged: (locale) => setState(() => _locale = locale),
         onThemeChanged: (mode) => setState(() => _themeMode = mode),
