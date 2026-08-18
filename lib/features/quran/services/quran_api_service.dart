@@ -1,41 +1,61 @@
-import 'package:dio/dio.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class QuranApiService {
-  final Dio _dio = Dio();
+  static const String _baseUrl = 'https://api.alquran.cloud/v1';
+  static const String _tafsirBaseUrl = 'https://api.alquran.cloud/v1';
   
-  // جلب قائمة السور
-  Future<List<dynamic>> getSurahList() async {
+  // جلب سورة كاملة
+  Future<Map<String, dynamic>> getSurah(int number) async {
     try {
-      final response = await _dio.get(
-        'https://api.alquran.cloud/v1/surah',
+      final response = await http.get(
+        Uri.parse('$_baseUrl/surah/$number/quran-uthmani'),
       );
-      return response.data['data'];
+      
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        return data['data'];
+      } else {
+        throw Exception('فشل في تحميل السورة');
+      }
     } catch (e) {
-      throw Exception('فشل في تحميل قائمة السور');
+      print('Error fetching surah: $e');
+      rethrow;
     }
   }
   
-  // جلب سورة معينة مع الآيات
-  Future<Map<String, dynamic>> getSurah(int surahNumber) async {
+  // جلب التفسير
+  Future<String> getTafsir(int surahNum, int ayahNum, {String tafsirType = 'ar.muyassar'}) async {
     try {
-      final response = await _dio.get(
-        'https://api.alquran.cloud/v1/surah/$surahNumber',
+      final response = await http.get(
+        Uri.parse('$_tafsirBaseUrl/ayah/$surahNum:$ayahNum/$tafsirType'),
       );
-      return response.data['data'];
+      
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        return data['data']['text'] ?? 'لا يوجد تفسير متاح';
+      } else {
+        return 'تعذر تحميل التفسير';
+      }
     } catch (e) {
-      throw Exception('فشل في تحميل السورة');
+      print('Error fetching tafsir: $e');
+      return 'حدث خطأ في تحميل التفسير';
     }
   }
   
-  // جلب آية معينة
-  Future<Map<String, dynamic>> getAyah(int surahNumber, int ayahNumber) async {
-    try {
-      final response = await _dio.get(
-        'https://api.alquran.cloud/v1/ayah/$surahNumber:$ayahNumber',
-      );
-      return response.data['data'];
-    } catch (e) {
-      throw Exception('فشل في تحميل الآية');
-    }
+  // رابط الصوت
+  String getAudioUrl(String reciterId, int ayahNumber) {
+    return 'https://cdn.islamic.network/quran/audio/128/$reciterId/$ayahNumber.mp3';
+  }
+  
+  // قائمة القراء
+  List<Map<String, String>> getReciters() {
+    return [
+      {'id': 'ar.alafasy', 'name': 'مشاري العفاسي'},
+      {'id': 'ar.abdurrahmaansudais', 'name': 'عبد الرحمن السديس'},
+      {'id': 'ar.husary', 'name': 'محمود خليل الحصري'},
+      {'id': 'ar.minshawi', 'name': 'محمد صديق المنشاوي'},
+      {'id': 'ar.abdulbasitmurattal', 'name': 'عبد الباسط عبد الصمد'},
+    ];
   }
 }
