@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <circle cx="32" cy="32" r="8" fill="currentColor"/>
+  <path d="M32 24v-8" stroke-width="2.5"/>
+  <circle cx="32" cy="12" r="3" fill="currentColor"/>
+  <path d="M24 32h-8" stroke-width="2.5"/>
+  <circle cx="12" cy="32" r="3" fill="currentColor"/>
+  <path d="M40 32h8" stroke-width="2.5"/>
+  <circle cx="52" cy="32" r="3" fill="currentColor"/>
+  <path d="M32 40v8" stroke-width="2.5"/>
+  <circle cx="32" cy="52" r="3" fill="currentColor"/>
+  <path d="M20 20l-6-6" stroke-width="2"/>
+  <circle cx="10" cy="10" r="3" fill="currentColor" opacity="0.5"/>
+  <path d="M44 20l6-6" stroke-width="2"/>
+  <circle cx="54" cy="10" r="3" fill="currentColor" opacity="0.5"/>
+  <path d="M20 44l-6 6" stroke-width="2"/>
+  <circle cx="10" cy="54" r="3" fill="currentColor" opacity="0.5"/>
+  <path d="M44 44l6 6" stroke-width="2"/>
+  <circle cx="54" cy="54" r="3" fill="currentColor" opacity="0.5"/>
+  <circle cx="32" cy="32" r="20" stroke-width="1" opacity="0.2"/>
+  <circle cx="32" cy="32" r="28" stroke-width="1" opacity="0.1"/>
+</svg>

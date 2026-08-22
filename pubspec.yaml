@@ -21,9 +21,13 @@ dependencies:
   # Audio
   audioplayers: ^5.2.1
 
+  # Icons - Updated for Flutter 3.27+
+  font_awesome_flutter: ^11.0.0
+  flutter_svg: ^2.0.9
+  iconsax: ^0.0.8
+
   # UI & Assets
   flutter_animate: ^4.5.0
-  flutter_svg: ^2.0.9
   google_fonts: ^6.1.0
   cached_network_image: ^3.3.1
 
