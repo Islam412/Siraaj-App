@@ -62,11 +62,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   // حساب حجم الأيقونة بناءً على عرض الشاشة
   double _getIconSize(double screenWidth) {
-    if (screenWidth < 400) return 48;      // شاشات صغيرة جداً
-    if (screenWidth < 600) return 56;      // موبايل
-    if (screenWidth < 900) return 64;      // تابلت صغير
-    if (screenWidth < 1200) return 72;     // تابلت كبير
-    return 80;                              // ديسكتوب
+    if (screenWidth < 400) return 64;      // شاشات صغيرة جداً
+    if (screenWidth < 600) return 72;      // موبايل
+    if (screenWidth < 900) return 120;      // تابلت صغير
+    if (screenWidth < 1200) return 96;     // تابلت كبير
+    return 120;                              // ديسكتوب
   }
 
   // حساب عدد الأعمدة بناءً على عرض الشاشة
@@ -80,9 +80,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   // حساب نسبة البطاقة
   double _getChildAspectRatio(double screenWidth) {
-    if (screenWidth < 600) return 1.0;     // موبايل
-    if (screenWidth < 900) return 1.1;     // تابلت
-    return 1.2;                             // ديسكتوب
+    if (screenWidth < 600) return 0.85;     // موبايل
+    if (screenWidth < 900) return 0.95;     // تابلت
+    return 1.0;                             // ديسكتوب
   }
 
   @override
