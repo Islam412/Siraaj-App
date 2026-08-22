@@ -107,7 +107,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 physics: const NeverScrollableScrollPhysics(),
                 mainAxisSpacing: 12,
                 crossAxisSpacing: 12,
-                childAspectRatio: 1.1,
+                childAspectRatio: 1.0,
                 children: [
                   _buildFeatureCard(
                     context,
@@ -354,8 +354,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             children: [
               Image.asset(
                 iconPath,
-                width: 48,
-                height: 48,
+                width: 80,
+                height: 80,
                 errorBuilder: (context, error, stackTrace) {
                   return Icon(
                     Icons.error,
