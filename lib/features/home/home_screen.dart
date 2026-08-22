@@ -1,21 +1,84 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import '../../core/providers/settings_provider.dart';
 
-class HomeScreen extends ConsumerWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends ConsumerState<HomeScreen> {
+  Timer? _countdownTimer;
+  Duration _timeRemaining = Duration.zero;
+  String _nextPrayerName = 'الظهر';
+  String _nextPrayerTime = '12:30';
+  String _hijriDate = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _updateHijriDate();
+    _startCountdown();
+  }
+
+  void _updateHijriDate() {
+    final now = DateTime.now();
+    // تاريخ هجري تقريبي (يمكن استخدام مكتبة hijri لاحقاً)
+    _hijriDate = DateFormat('dd MMMM yyyy', 'ar').format(now);
+  }
+
+  void _startCountdown() {
+    // وقت الصلاة التالية (مثال: الظهر 12:30)
+    final now = DateTime.now();
+    final nextPrayer = DateTime(now.year, now.month, now.day, 12, 30);
+    
+    _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      final currentTime = DateTime.now();
+      final remaining = nextPrayer.difference(currentTime);
+      
+      if (mounted) {
+        setState(() {
+          _timeRemaining = remaining > Duration.zero ? remaining : Duration.zero;
+        });
+      }
+    });
+  }
+
+  String _formatDuration(Duration duration) {
+    final hours = duration.inHours;
+    final minutes = duration.inMinutes.remainder(60);
+    final seconds = duration.inSeconds.remainder(60);
+    return '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
+  }
+
+  @override
+  void dispose() {
+    _countdownTimer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('سراج'),
+        title: const Text(
+          'Siraaj',
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 1.5,
+          ),
+        ),
         centerTitle: true,
         actions: [
           IconButton(
             icon: const Icon(Icons.settings, color: Colors.white),
-            onPressed: () => _showSettings(context, ref),
+            onPressed: () => _showSettings(context),
           ),
         ],
       ),
@@ -25,8 +88,11 @@ class HomeScreen extends ConsumerWidget {
           padding: const EdgeInsets.all(16),
           child: Column(
             children: [
-              _buildTopBanner(context),
+              // Banner الصلاة التالية المحسّن
+              _buildPrayerBanner(context),
               const SizedBox(height: 20),
+              
+              // Grid الأيقونات
               GridView.count(
                 crossAxisCount: 2,
                 shrinkWrap: true,
@@ -156,29 +222,102 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildTopBanner(BuildContext context) {
+  Widget _buildPrayerBanner(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [Color(0xFF1565A8), Color(0xFF2180CC)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color(0xFF1565A8),
+            Color(0xFF2180CC),
+            Color(0xFF42A5F5),
+          ],
         ),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF1565A8).withOpacity(0.4),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
       ),
-      child: const Column(
+      child: Column(
         children: [
+          // التاريخ الهجري
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.calendar_today, color: Colors.white.withOpacity(0.8), size: 16),
+              const SizedBox(width: 8),
+              Text(
+                _hijriDate,
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.9),
+                  fontSize: 14,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          
+          // اسم الصلاة
           Text(
-            'الظهر',
+            'الصلاة التالية',
             style: TextStyle(
+              color: Colors.white.withOpacity(0.9),
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(height: 8),
+          
+          Text(
+            _nextPrayerName,
+            style: const TextStyle(
               color: Colors.white,
-              fontSize: 28,
+              fontSize: 36,
               fontWeight: FontWeight.bold,
             ),
           ),
-          SizedBox(height: 8),
+          const SizedBox(height: 16),
+          
+          // العد التنازلي
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(30),
+              border: Border.all(color: Colors.white.withOpacity(0.3)),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.timer, color: Colors.white, size: 20),
+                const SizedBox(width: 8),
+                Text(
+                  _formatDuration(_timeRemaining),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'monospace',
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          
+          // وقت الصلاة
           Text(
-            'الصلاة التالية',
-            style: TextStyle(color: Colors.white70, fontSize: 14),
+            'الساعة $_nextPrayerTime',
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.9),
+              fontSize: 14,
+            ),
           ),
         ],
       ),
@@ -213,6 +352,9 @@ class HomeScreen extends ConsumerWidget {
                 iconPath,
                 width: 48,
                 height: 48,
+                errorBuilder: (context, error, stackTrace) {
+                  return Icon(Icons.error, color: Colors.grey.shade400);
+                },
               ),
               const SizedBox(height: 8),
               Text(
@@ -238,7 +380,7 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
-  void _showSettings(BuildContext context, WidgetRef ref) {
+  void _showSettings(BuildContext context) {
     showModalBottomSheet(
       context: context,
       builder: (context) => Consumer(
