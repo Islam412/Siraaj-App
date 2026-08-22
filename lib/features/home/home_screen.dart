@@ -60,9 +60,35 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     super.dispose();
   }
 
+  // حساب حجم الأيقونة بناءً على عرض الشاشة
+  double _getIconSize(double screenWidth) {
+    if (screenWidth < 400) return 48;      // شاشات صغيرة جداً
+    if (screenWidth < 600) return 56;      // موبايل
+    if (screenWidth < 900) return 64;      // تابلت صغير
+    if (screenWidth < 1200) return 72;     // تابلت كبير
+    return 80;                              // ديسكتوب
+  }
+
+  // حساب عدد الأعمدة بناءً على عرض الشاشة
+  int _getCrossAxisCount(double screenWidth) {
+    if (screenWidth < 400) return 2;       // موبايل صغير
+    if (screenWidth < 600) return 2;       // موبايل
+    if (screenWidth < 900) return 3;       // تابلت
+    if (screenWidth < 1200) return 4;      // تابلت كبير
+    return 5;                               // ديسكتوب
+  }
+
+  // حساب نسبة البطاقة
+  double _getChildAspectRatio(double screenWidth) {
+    if (screenWidth < 600) return 1.0;     // موبايل
+    if (screenWidth < 900) return 1.1;     // تابلت
+    return 1.2;                             // ديسكتوب
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final screenWidth = MediaQuery.of(context).size.width;
     
     return Scaffold(
       appBar: AppBar(
@@ -76,7 +102,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ),
         centerTitle: true,
         actions: [
-          // زر تبديل الوضع الليلي/النهاري
           IconButton(
             icon: Icon(
               isDark ? Icons.light_mode : Icons.dark_mode,
@@ -95,136 +120,160 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ),
       body: Container(
         color: isDark ? const Color(0xFF0B1623) : const Color(0xFFF5F6F8),
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              _buildPrayerBanner(context, isDark),
-              const SizedBox(height: 20),
-              GridView.count(
-                crossAxisCount: 2,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                mainAxisSpacing: 12,
-                crossAxisSpacing: 12,
-                childAspectRatio: 1.0,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final iconSize = _getIconSize(constraints.maxWidth);
+            final crossAxisCount = _getCrossAxisCount(constraints.maxWidth);
+            final childAspectRatio = _getChildAspectRatio(constraints.maxWidth);
+            
+            return SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: Column(
                 children: [
-                  _buildFeatureCard(
-                    context,
-                    iconPath: 'assets/icons/quran.png',
-                    title: 'القرآن',
-                    subtitle: 'Quran',
-                    onTap: () => context.push('/quran'),
-                  ),
-                  _buildFeatureCard(
-                    context,
-                    iconPath: 'assets/icons/qibla.png',
-                    title: 'القبلة',
-                    subtitle: 'Qibla',
-                    onTap: () => context.push('/qibla'),
-                  ),
-                  _buildFeatureCard(
-                    context,
-                    iconPath: 'assets/icons/prayer.png',
-                    title: 'أوقات الصلاة',
-                    subtitle: 'Prayer Times',
-                    onTap: () => context.push('/prayer'),
-                  ),
-                  _buildFeatureCard(
-                    context,
-                    iconPath: 'assets/icons/tasbih.png',
-                    title: 'المسبحة',
-                    subtitle: 'Tasbih',
-                    onTap: () => context.push('/tasbih'),
-                  ),
-                  _buildFeatureCard(
-                    context,
-                    iconPath: 'assets/icons/azkar.png',
-                    title: 'أذكار اليوم',
-                    subtitle: 'Daily Azkar',
-                    onTap: () => context.push('/azkar'),
-                  ),
-                  _buildFeatureCard(
-                    context,
-                    iconPath: 'assets/icons/hadith.png',
-                    title: 'الأحاديث',
-                    subtitle: 'Hadith',
-                    onTap: () => context.push('/hadith'),
-                  ),
-                  _buildFeatureCard(
-                    context,
-                    iconPath: 'assets/icons/radio.png',
-                    title: 'الإذاعة',
-                    subtitle: 'Radio',
-                    onTap: () => context.push('/radio'),
-                  ),
-                  _buildFeatureCard(
-                    context,
-                    iconPath: 'assets/icons/podcast.png',
-                    title: 'البودكاست',
-                    subtitle: 'Podcast',
-                    onTap: () => context.push('/podcast'),
-                  ),
-                  _buildFeatureCard(
-                    context,
-                    iconPath: 'assets/icons/lectures.png',
-                    title: 'المحاضرات',
-                    subtitle: 'Lectures',
-                    onTap: () => context.push('/lectures'),
-                  ),
-                  _buildFeatureCard(
-                    context,
-                    iconPath: 'assets/icons/books.png',
-                    title: 'الكتب',
-                    subtitle: 'Books',
-                    onTap: () => context.push('/books'),
-                  ),
-                  _buildFeatureCard(
-                    context,
-                    iconPath: 'assets/icons/asma_allah.png',
-                    title: 'أسماء الله',
-                    subtitle: '99 Names',
-                    onTap: () => context.push('/asma-allah'),
-                  ),
-                  _buildFeatureCard(
-                    context,
-                    iconPath: 'assets/icons/zakat.png',
-                    title: 'الزكاة',
-                    subtitle: 'Zakat',
-                    onTap: () => context.push('/zakat'),
-                  ),
-                  _buildFeatureCard(
-                    context,
-                    iconPath: 'assets/icons/calendar.png',
-                    title: 'التقويم الهجري',
-                    subtitle: 'Hijri Calendar',
-                    onTap: () => context.push('/calendar'),
-                  ),
-                  _buildFeatureCard(
-                    context,
-                    iconPath: 'assets/icons/stories.png',
-                    title: 'قصص الأنبياء',
-                    subtitle: 'Stories',
-                    onTap: () => context.push('/stories'),
-                  ),
-                  _buildFeatureCard(
-                    context,
-                    iconPath: 'assets/icons/duas.png',
-                    title: 'أدعية مختارة',
-                    subtitle: 'Duas',
-                    onTap: () => context.push('/duas'),
-                  ),
-                  _buildFeatureCard(
-                    context,
-                    iconPath: 'assets/icons/muhasaba.png',
-                    title: 'محاسبة النفس',
-                    subtitle: 'Muhasaba',
-                    onTap: () => context.push('/muhasaba'),
+                  _buildPrayerBanner(context, isDark),
+                  const SizedBox(height: 20),
+                  GridView.count(
+                    crossAxisCount: crossAxisCount,
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    mainAxisSpacing: 12,
+                    crossAxisSpacing: 12,
+                    childAspectRatio: childAspectRatio,
+                    children: [
+                      _buildFeatureCard(
+                        context,
+                        iconPath: 'assets/icons/quran.png',
+                        title: 'القرآن',
+                        subtitle: 'Quran',
+                        iconSize: iconSize,
+                        onTap: () => context.push('/quran'),
+                      ),
+                      _buildFeatureCard(
+                        context,
+                        iconPath: 'assets/icons/qibla.png',
+                        title: 'القبلة',
+                        subtitle: 'Qibla',
+                        iconSize: iconSize,
+                        onTap: () => context.push('/qibla'),
+                      ),
+                      _buildFeatureCard(
+                        context,
+                        iconPath: 'assets/icons/prayer.png',
+                        title: 'أوقات الصلاة',
+                        subtitle: 'Prayer Times',
+                        iconSize: iconSize,
+                        onTap: () => context.push('/prayer'),
+                      ),
+                      _buildFeatureCard(
+                        context,
+                        iconPath: 'assets/icons/tasbih.png',
+                        title: 'المسبحة',
+                        subtitle: 'Tasbih',
+                        iconSize: iconSize,
+                        onTap: () => context.push('/tasbih'),
+                      ),
+                      _buildFeatureCard(
+                        context,
+                        iconPath: 'assets/icons/azkar.png',
+                        title: 'أذكار اليوم',
+                        subtitle: 'Daily Azkar',
+                        iconSize: iconSize,
+                        onTap: () => context.push('/azkar'),
+                      ),
+                      _buildFeatureCard(
+                        context,
+                        iconPath: 'assets/icons/hadith.png',
+                        title: 'الأحاديث',
+                        subtitle: 'Hadith',
+                        iconSize: iconSize,
+                        onTap: () => context.push('/hadith'),
+                      ),
+                      _buildFeatureCard(
+                        context,
+                        iconPath: 'assets/icons/radio.png',
+                        title: 'الإذاعة',
+                        subtitle: 'Radio',
+                        iconSize: iconSize,
+                        onTap: () => context.push('/radio'),
+                      ),
+                      _buildFeatureCard(
+                        context,
+                        iconPath: 'assets/icons/podcast.png',
+                        title: 'البودكاست',
+                        subtitle: 'Podcast',
+                        iconSize: iconSize,
+                        onTap: () => context.push('/podcast'),
+                      ),
+                      _buildFeatureCard(
+                        context,
+                        iconPath: 'assets/icons/lectures.png',
+                        title: 'المحاضرات',
+                        subtitle: 'Lectures',
+                        iconSize: iconSize,
+                        onTap: () => context.push('/lectures'),
+                      ),
+                      _buildFeatureCard(
+                        context,
+                        iconPath: 'assets/icons/books.png',
+                        title: 'الكتب',
+                        subtitle: 'Books',
+                        iconSize: iconSize,
+                        onTap: () => context.push('/books'),
+                      ),
+                      _buildFeatureCard(
+                        context,
+                        iconPath: 'assets/icons/asma_allah.png',
+                        title: 'أسماء الله',
+                        subtitle: '99 Names',
+                        iconSize: iconSize,
+                        onTap: () => context.push('/asma-allah'),
+                      ),
+                      _buildFeatureCard(
+                        context,
+                        iconPath: 'assets/icons/zakat.png',
+                        title: 'الزكاة',
+                        subtitle: 'Zakat',
+                        iconSize: iconSize,
+                        onTap: () => context.push('/zakat'),
+                      ),
+                      _buildFeatureCard(
+                        context,
+                        iconPath: 'assets/icons/calendar.png',
+                        title: 'التقويم الهجري',
+                        subtitle: 'Hijri Calendar',
+                        iconSize: iconSize,
+                        onTap: () => context.push('/calendar'),
+                      ),
+                      _buildFeatureCard(
+                        context,
+                        iconPath: 'assets/icons/stories.png',
+                        title: 'قصص الأنبياء',
+                        subtitle: 'Stories',
+                        iconSize: iconSize,
+                        onTap: () => context.push('/stories'),
+                      ),
+                      _buildFeatureCard(
+                        context,
+                        iconPath: 'assets/icons/duas.png',
+                        title: 'أدعية مختارة',
+                        subtitle: 'Duas',
+                        iconSize: iconSize,
+                        onTap: () => context.push('/duas'),
+                      ),
+                      _buildFeatureCard(
+                        context,
+                        iconPath: 'assets/icons/muhasaba.png',
+                        title: 'محاسبة النفس',
+                        subtitle: 'Muhasaba',
+                        iconSize: iconSize,
+                        onTap: () => context.push('/muhasaba'),
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ],
-          ),
+            );
+          },
         ),
       ),
     );
@@ -329,6 +378,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     required String iconPath,
     required String title,
     required String subtitle,
+    required double iconSize,
     required VoidCallback onTap,
   }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -349,38 +399,44 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               color: isDark ? const Color(0xFF1E3A5F) : Colors.grey.shade100,
             ),
           ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Image.asset(
-                iconPath,
-                width: 80,
-                height: 80,
-                errorBuilder: (context, error, stackTrace) {
-                  return Icon(
-                    Icons.error,
-                    color: isDark ? Colors.grey.shade600 : Colors.grey.shade400,
-                  );
-                },
-              ),
-              const SizedBox(height: 8),
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: isDark ? const Color(0xFF2180CC) : const Color(0xFF1565A8),
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Image.asset(
+                  iconPath,
+                  width: iconSize,
+                  height: iconSize,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Icon(
+                      Icons.error,
+                      color: isDark ? Colors.grey.shade600 : Colors.grey.shade400,
+                      size: iconSize,
+                    );
+                  },
                 ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                subtitle,
-                style: TextStyle(
-                  fontSize: 11,
-                  color: isDark ? Colors.grey.shade500 : Colors.grey.shade600,
+                const SizedBox(height: 8),
+                Text(
+                  title,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: isDark ? const Color(0xFF2180CC) : const Color(0xFF1565A8),
+                  ),
                 ),
-              ),
-            ],
+                const SizedBox(height: 4),
+                Text(
+                  subtitle,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: isDark ? Colors.grey.shade500 : Colors.grey.shade600,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
