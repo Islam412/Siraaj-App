@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'services/quran_api_service.dart';
@@ -55,7 +56,7 @@ class _QuranScreenState extends ConsumerState<QuranScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('القرآن الكريم'),
+        title: Text('القرآن الكريم', style: GoogleFonts.amiri(fontSize: 24, fontWeight: FontWeight.bold)),
         actions: [
           PopupMenuButton<String>(
             icon: const Icon(Icons.headphones, color: Colors.white),
@@ -78,7 +79,7 @@ class _QuranScreenState extends ConsumerState<QuranScreen> {
                       const Icon(Icons.check, color: Colors.blue, size: 18),
                     if (!isSelected) const SizedBox(width: 18),
                     const SizedBox(width: 8),
-                    Text(reciter['name']!),
+                    Text(reciter['name']!, style: GoogleFonts.amiri(fontSize: 14)),
                   ],
                 ),
               );
@@ -90,7 +91,6 @@ class _QuranScreenState extends ConsumerState<QuranScreen> {
           ? const Center(child: CircularProgressIndicator())
           : Column(
               children: [
-                // شريط القارئ الحالي
                 Container(
                   padding: const EdgeInsets.all(12),
                   color: Theme.of(context).colorScheme.surface,
@@ -101,7 +101,7 @@ class _QuranScreenState extends ConsumerState<QuranScreen> {
                       Expanded(
                         child: Text(
                           'القارئ: $_selectedReciterName',
-                          style: const TextStyle(
+                          style: GoogleFonts.amiri(
                             fontWeight: FontWeight.bold,
                             fontSize: 14,
                           ),
@@ -118,23 +118,19 @@ class _QuranScreenState extends ConsumerState<QuranScreen> {
                     ],
                   ),
                 ),
-                // قائمة السور
                 Expanded(
                   child: ListView.builder(
                     itemCount: _surahs.length,
                     itemBuilder: (context, index) {
                       final surah = _surahs[index];
                       return Card(
-                        margin: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 6,
-                        ),
+                        margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                         child: ListTile(
                           leading: CircleAvatar(
                             backgroundColor: Colors.blue.shade50,
                             child: Text(
                               '${surah['number']}',
-                              style: TextStyle(
+                              style: GoogleFonts.amiri(
                                 color: Colors.blue.shade800,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -142,15 +138,14 @@ class _QuranScreenState extends ConsumerState<QuranScreen> {
                           ),
                           title: Text(
                             surah['name'],
-                            style: const TextStyle(
+                            style: GoogleFonts.amiri(
                               fontWeight: FontWeight.bold,
-                              fontFamily: 'Amiri',
                               fontSize: 18,
                             ),
                           ),
                           subtitle: Text(
                             '${surah['numberOfAyahs']} آية - ${surah['revelationType'] == 'Meccan' ? 'مكية' : 'مدنية'}',
-                            style: const TextStyle(fontSize: 13),
+                            style: GoogleFonts.amiri(fontSize: 13),
                           ),
                           trailing: const Icon(Icons.chevron_left),
                           onTap: () => _openSurah(surah),
@@ -214,7 +209,7 @@ class _MushafScreenState extends State<MushafScreen> {
   bool _showTafsir = false;
   String _tafsirText = '';
   int _selectedTafsirAyah = 0;
-  String _selectedTafsirBook = 'ar.muyassar'; // التفسير الميسر افتراضياً
+  String _selectedTafsirBook = 'ar.muyassar';
 
   @override
   void initState() {
@@ -241,19 +236,16 @@ class _MushafScreenState extends State<MushafScreen> {
       ayah['number'],
     );
 
-    // إذا كانت الآية نفسها تُعزف، أوقفها
     if (_playingAyahIndex == index) {
       await _audioPlayer.stop();
       setState(() => _playingAyahIndex = -1);
       return;
     }
 
-    // تشغيل الآية الجديدة - الطريقة الصحيحة للإصدار الجديد
     setState(() => _playingAyahIndex = index);
     widget.onAyahSelected(index);
 
     try {
-      // الطريقة الصحيحة: استخدام play مع UrlSource
       await _audioPlayer.play(UrlSource(url));
 
       _audioPlayer.onPlayerComplete.listen((event) {
@@ -287,7 +279,12 @@ class _MushafScreenState extends State<MushafScreen> {
             children: [
               const Icon(Icons.menu_book, color: Colors.blue),
               const SizedBox(width: 8),
-              Expanded(child: Text('تفسير الآية ${ayah['numberInSurah']}')),
+              Expanded(
+                child: Text(
+                  'تفسير الآية ${ayah['numberInSurah']}',
+                  style: GoogleFonts.amiri(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+              ),
             ],
           ),
           content: SizedBox(
@@ -295,7 +292,6 @@ class _MushafScreenState extends State<MushafScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Dropdown لاختيار التفسير
                 DropdownButtonFormField<String>(
                   value: _selectedTafsirBook,
                   decoration: const InputDecoration(
@@ -305,7 +301,7 @@ class _MushafScreenState extends State<MushafScreen> {
                   items: _apiService.getTafsirBooks().map((tafsir) {
                     return DropdownMenuItem(
                       value: tafsir['id'],
-                      child: Text(tafsir['name']!),
+                      child: Text(tafsir['name']!, style: GoogleFonts.amiri()),
                     );
                   }).toList(),
                   onChanged: (value) {
@@ -318,17 +314,16 @@ class _MushafScreenState extends State<MushafScreen> {
                   },
                 ),
                 const SizedBox(height: 16),
-                // نص التفسير
                 Expanded(
                   child: SingleChildScrollView(
                     child: Text(
                       _tafsirText,
-                      style: const TextStyle(
+                      style: GoogleFonts.amiri(
                         fontSize: 16,
                         height: 1.8,
-                        fontFamily: 'Amiri',
                       ),
                       textAlign: TextAlign.right,
+                      textDirection: TextDirection.rtl,
                     ),
                   ),
                 ),
@@ -341,14 +336,13 @@ class _MushafScreenState extends State<MushafScreen> {
                 Navigator.pop(context);
                 setState(() => _showTafsir = false);
               },
-              child: const Text('إغلاق', style: TextStyle(fontWeight: FontWeight.bold)),
+              child: Text('إغلاق', style: GoogleFonts.amiri(fontWeight: FontWeight.bold)),
             ),
           ],
         ),
       ),
     );
 
-    // تحميل التفسير الافتراضي
     _loadTafsir(ayah['numberInSurah'], _selectedTafsirBook);
   }
 
@@ -376,7 +370,7 @@ class _MushafScreenState extends State<MushafScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.surah['name']),
+        title: Text(widget.surah['name'], style: GoogleFonts.amiri(fontSize: 22, fontWeight: FontWeight.bold)),
         actions: [
           IconButton(
             icon: Icon(_showTafsir ? Icons.visibility_off : Icons.visibility),
@@ -391,7 +385,6 @@ class _MushafScreenState extends State<MushafScreen> {
           ? const Center(child: CircularProgressIndicator())
           : Column(
               children: [
-                // شريط معلومات القارئ
                 Container(
                   padding: const EdgeInsets.all(12),
                   color: Theme.of(context).colorScheme.surface,
@@ -402,7 +395,7 @@ class _MushafScreenState extends State<MushafScreen> {
                       Expanded(
                         child: Text(
                           'القارئ: ${widget.reciterName}',
-                          style: const TextStyle(
+                          style: GoogleFonts.amiri(
                             fontWeight: FontWeight.bold,
                             fontSize: 14,
                           ),
@@ -419,7 +412,6 @@ class _MushafScreenState extends State<MushafScreen> {
                     ],
                   ),
                 ),
-                // نص القرآن
                 Expanded(
                   child: Container(
                     color: const Color(0xFFFFFBF0),
@@ -427,36 +419,27 @@ class _MushafScreenState extends State<MushafScreen> {
                       padding: const EdgeInsets.all(20),
                       child: Column(
                         children: [
-                          // رأس السورة
                           Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 32,
-                              vertical: 16,
-                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                             decoration: BoxDecoration(
-                              border: Border.all(
-                                color: const Color(0xFFB8922A),
-                                width: 2,
-                              ),
+                              border: Border.all(color: const Color(0xFFB8922A), width: 2),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Column(
                               children: [
                                 Text(
                                   'سورة ${widget.surah['name']}',
-                                  style: const TextStyle(
-                                    fontSize: 28,
-                                    fontFamily: 'Amiri',
+                                  style: GoogleFonts.amiriQuran(
+                                    fontSize: 32,
                                     fontWeight: FontWeight.bold,
-                                    color: Color(0xFF8B6914),
+                                    color: const Color(0xFF8B6914),
                                   ),
                                 ),
                                 const SizedBox(height: 8),
                                 Text(
                                   '${widget.surah['revelationType'] == 'Meccan' ? 'مكية' : 'مدنية'} • ${widget.surah['numberOfAyahs']} آية',
-                                  style: TextStyle(
+                                  style: GoogleFonts.amiri(
                                     fontSize: 16,
-                                    fontFamily: 'Amiri',
                                     color: Colors.grey.shade700,
                                   ),
                                 ),
@@ -464,24 +447,22 @@ class _MushafScreenState extends State<MushafScreen> {
                             ),
                           ),
                           const SizedBox(height: 20),
-                          // البسملة
                           if (widget.surah['number'] != 9)
                             Padding(
                               padding: const EdgeInsets.only(bottom: 20),
                               child: Text(
                                 'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ',
-                                style: TextStyle(
-                                  fontSize: 24,
-                                  fontFamily: 'Amiri',
+                                style: GoogleFonts.amiriQuran(
+                                  fontSize: 28,
                                   color: const Color(0xFF8B6914),
                                   height: 2,
                                 ),
                                 textAlign: TextAlign.center,
+                                textDirection: TextDirection.rtl,
                               ),
                             ),
                           const Divider(color: Color(0xFFB8922A)),
                           const SizedBox(height: 20),
-                          // الآيات
                           ..._ayahs.asMap().entries.map((entry) {
                             final index = entry.key;
                             final ayah = entry.value;
@@ -510,34 +491,29 @@ class _MushafScreenState extends State<MushafScreen> {
                                   children: [
                                     Text(
                                       ayah['text'],
-                                      style: TextStyle(
-                                        fontSize: 22,
-                                        fontFamily: 'Amiri',
-                                        height: 2.5,
+                                      style: GoogleFonts.amiriQuran(
+                                        fontSize: 26,
+                                        height: 2.8,
                                         color: isPlaying
                                             ? const Color(0xFF8B6914)
                                             : const Color(0xFF1A1A1A),
                                       ),
                                       textAlign: TextAlign.right,
+                                      textDirection: TextDirection.rtl,
                                     ),
                                     const SizedBox(height: 12),
                                     Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
                                         Container(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 12,
-                                            vertical: 6,
-                                          ),
+                                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                                           decoration: BoxDecoration(
                                             color: const Color(0xFFB8922A),
-                                            borderRadius:
-                                                BorderRadius.circular(20),
+                                            borderRadius: BorderRadius.circular(20),
                                           ),
                                           child: Text(
                                             'آية ${_toArabicNumerals(ayah['numberInSurah'])}',
-                                            style: const TextStyle(
+                                            style: GoogleFonts.amiri(
                                               color: Colors.white,
                                               fontWeight: FontWeight.bold,
                                               fontSize: 13,
@@ -548,25 +524,15 @@ class _MushafScreenState extends State<MushafScreen> {
                                           children: [
                                             IconButton(
                                               icon: Icon(
-                                                isPlaying
-                                                    ? Icons.pause
-                                                    : Icons.play_arrow,
-                                                color: isPlaying
-                                                    ? const Color(0xFFB8922A)
-                                                    : Colors.blue,
+                                                isPlaying ? Icons.pause : Icons.play_arrow,
+                                                color: isPlaying ? const Color(0xFFB8922A) : Colors.blue,
                                               ),
                                               onPressed: () => _playAyah(index),
-                                              tooltip: isPlaying
-                                                  ? 'إيقاف'
-                                                  : 'استماع',
+                                              tooltip: isPlaying ? 'إيقاف' : 'استماع',
                                             ),
                                             IconButton(
-                                              icon: const Icon(
-                                                Icons.menu_book_outlined,
-                                                color: Colors.green,
-                                              ),
-                                              onPressed: () =>
-                                                  _showTafsirDialog(index),
+                                              icon: const Icon(Icons.menu_book_outlined, color: Colors.green),
+                                              onPressed: () => _showTafsirDialog(index),
                                               tooltip: 'التفسير',
                                             ),
                                           ],
