@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../core/providers/settings_provider.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -60,29 +61,26 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     super.dispose();
   }
 
-  // حساب حجم الأيقونة بناءً على عرض الشاشة
   double _getIconSize(double screenWidth) {
-    if (screenWidth < 400) return 64;      // شاشات صغيرة جداً
-    if (screenWidth < 600) return 72;      // موبايل
-    if (screenWidth < 900) return 120;      // تابلت صغير
-    if (screenWidth < 1200) return 96;     // تابلت كبير
-    return 120;                              // ديسكتوب
+    if (screenWidth < 400) return 64;
+    if (screenWidth < 600) return 72;
+    if (screenWidth < 900) return 80;
+    if (screenWidth < 1200) return 96;
+    return 120;
   }
 
-  // حساب عدد الأعمدة بناءً على عرض الشاشة
   int _getCrossAxisCount(double screenWidth) {
-    if (screenWidth < 400) return 2;       // موبايل صغير
-    if (screenWidth < 600) return 2;       // موبايل
-    if (screenWidth < 900) return 3;       // تابلت
-    if (screenWidth < 1200) return 4;      // تابلت كبير
-    return 5;                               // ديسكتوب
+    if (screenWidth < 400) return 2;
+    if (screenWidth < 600) return 2;
+    if (screenWidth < 900) return 3;
+    if (screenWidth < 1200) return 4;
+    return 5;
   }
 
-  // حساب نسبة البطاقة
   double _getChildAspectRatio(double screenWidth) {
-    if (screenWidth < 600) return 0.85;     // موبايل
-    if (screenWidth < 900) return 0.95;     // تابلت
-    return 1.0;                             // ديسكتوب
+    if (screenWidth < 600) return 0.85;
+    if (screenWidth < 900) return 0.95;
+    return 1.0;
   }
 
   @override
@@ -92,11 +90,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Siraaj',
-          style: TextStyle(
-            fontSize: 24,
+        title: Text(
+          'سراج',
+          style: GoogleFonts.amiri(
+            fontSize: 28,
             fontWeight: FontWeight.bold,
+            color: Colors.white,
             letterSpacing: 1.5,
           ),
         ),
@@ -310,9 +309,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               const SizedBox(width: 8),
               Text(
                 _hijriDate,
-                style: TextStyle(
+                style: GoogleFonts.amiri(
                   color: Colors.white.withOpacity(0.9),
-                  fontSize: 14,
+                  fontSize: 16,
                 ),
               ),
             ],
@@ -320,18 +319,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           const SizedBox(height: 16),
           Text(
             'الصلاة التالية',
-            style: TextStyle(
+            style: GoogleFonts.amiri(
               color: Colors.white.withOpacity(0.9),
-              fontSize: 16,
+              fontSize: 18,
               fontWeight: FontWeight.w500,
             ),
           ),
           const SizedBox(height: 8),
           Text(
             _nextPrayerName,
-            style: const TextStyle(
+            style: GoogleFonts.amiriQuran(
               color: Colors.white,
-              fontSize: 36,
+              fontSize: 40,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -350,11 +349,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 const SizedBox(width: 8),
                 Text(
                   _formatDuration(_timeRemaining),
-                  style: const TextStyle(
+                  style: GoogleFonts.amiri(
                     color: Colors.white,
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
-                    fontFamily: 'monospace',
                   ),
                 ),
               ],
@@ -363,9 +361,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           const SizedBox(height: 12),
           Text(
             'الساعة $_nextPrayerTime',
-            style: TextStyle(
+            style: GoogleFonts.amiri(
               color: Colors.white.withOpacity(0.9),
-              fontSize: 14,
+              fontSize: 16,
             ),
           ),
         ],
@@ -420,9 +418,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 Text(
                   title,
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
+                  style: GoogleFonts.amiri(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
                     color: isDark ? const Color(0xFF2180CC) : const Color(0xFF1565A8),
                   ),
                 ),
@@ -430,8 +428,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 Text(
                   subtitle,
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 11,
+                  style: GoogleFonts.amiri(
+                    fontSize: 12,
                     color: isDark ? Colors.grey.shade500 : Colors.grey.shade600,
                   ),
                 ),
@@ -454,14 +452,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'الإعدادات',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              style: GoogleFonts.amiri(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             const SizedBox(height: 24),
             SwitchListTile(
-              title: const Text('الوضع الليلي'),
-              subtitle: const Text('تفعيل الوضع الداكن'),
+              title: Text(
+                'الوضع الليلي',
+                style: GoogleFonts.amiri(fontSize: 16),
+              ),
+              subtitle: Text(
+                'تفعيل الوضع الداكن',
+                style: GoogleFonts.amiri(fontSize: 14),
+              ),
               value: isDark,
               onChanged: (value) {
                 ref.read(themeModeProvider.notifier).toggleTheme();
