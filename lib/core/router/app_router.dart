@@ -6,7 +6,7 @@ import '../../features/hadith/hadith_screen.dart';
 import '../../features/azkar/azkar_screen.dart';
 import '../../features/tasbih/tasbih_screen.dart';
 import '../../features/prayer/prayer_screen.dart';
-import '../../features/qibla/qibla_screen.dart';
+import '../../features/qibla/screens/qibla_screen.dart';
 import '../../features/muhasaba/muhasaba_screen.dart';
 import '../../features/podcast/podcast_screen.dart';
 import '../../features/lectures/lectures_screen.dart';
@@ -29,6 +29,11 @@ class AppRouter {
         builder: (context, state) => const QuranScreen(),
       ),
       GoRoute(
+        path: '/qibla',
+        name: 'qibla',
+        builder: (context, state) => const QiblaScreen(),
+      ),
+      GoRoute(
         path: '/hadith',
         name: 'hadith',
         builder: (context, state) => const HadithScreen(),
@@ -47,11 +52,6 @@ class AppRouter {
         path: '/prayer',
         name: 'prayer',
         builder: (context, state) => const PrayerScreen(),
-      ),
-      GoRoute(
-        path: '/qibla',
-        name: 'qibla',
-        builder: (context, state) => const QiblaScreen(),
       ),
       GoRoute(
         path: '/muhasaba',

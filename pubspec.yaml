@@ -21,15 +21,11 @@ dependencies:
   # Audio
   audioplayers: ^5.2.1
 
-  # Icons - Updated for Flutter 3.27+
-  font_awesome_flutter: ^11.0.0
-  flutter_svg: ^2.0.9
-  iconsax: ^0.0.8
-
   # UI & Assets
   flutter_animate: ^4.5.0
   google_fonts: ^6.1.0
   cached_network_image: ^3.3.1
+  flutter_svg: ^2.0.9
 
   # Local Storage
   hive: ^2.2.3
@@ -41,6 +37,11 @@ dependencies:
     sdk: flutter
   intl: ^0.20.3
 
+  # Location & Sensors (للقبلة)
+  geolocator: ^11.0.0
+  sensors_plus: ^5.0.1
+  permission_handler: ^11.0.0
+
   cupertino_icons: ^1.0.6
 
 dev_dependencies:
@@ -50,7 +51,6 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
-
   assets:
     - assets/images/
     - assets/icons/
