@@ -368,189 +368,193 @@ class _MushafScreenState extends State<MushafScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.surah['name'], style: GoogleFonts.amiri(fontSize: 22, fontWeight: FontWeight.bold)),
-        actions: [
-          IconButton(
-            icon: Icon(_showTafsir ? Icons.visibility_off : Icons.visibility),
-            tooltip: _showTafsir ? 'إخفاء التفسير' : 'عرض التفسير',
-            onPressed: _showTafsir
-                ? () => setState(() => _showTafsir = false)
-                : null,
-          ),
-        ],
-      ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : Column(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  color: Theme.of(context).colorScheme.surface,
-                  child: Row(
-                    children: [
-                      const Icon(Icons.headphones, color: Colors.blue),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          'القارئ: ${widget.reciterName}',
-                          style: GoogleFonts.amiri(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14,
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(widget.surah['name'], style: GoogleFonts.amiri(fontSize: 22, fontWeight: FontWeight.bold)),
+          actions: [
+            IconButton(
+              icon: Icon(_showTafsir ? Icons.visibility_off : Icons.visibility),
+              tooltip: _showTafsir ? 'إخفاء التفسير' : 'عرض التفسير',
+              onPressed: _showTafsir
+                  ? () => setState(() => _showTafsir = false)
+                  : null,
+            ),
+          ],
+        ),
+        body: _isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : Column(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    color: Theme.of(context).colorScheme.surface,
+                    child: Row(
+                      children: [
+                        const Icon(Icons.headphones, color: Colors.blue),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            'القارئ: ${widget.reciterName}',
+                            style: GoogleFonts.amiri(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                            ),
                           ),
                         ),
-                      ),
-                      if (_playingAyahIndex >= 0)
-                        IconButton(
-                          icon: const Icon(Icons.stop),
-                          onPressed: () {
-                            _audioPlayer.stop();
-                            setState(() => _playingAyahIndex = -1);
-                          },
-                        ),
-                    ],
+                        if (_playingAyahIndex >= 0)
+                          IconButton(
+                            icon: const Icon(Icons.stop),
+                            onPressed: () {
+                              _audioPlayer.stop();
+                              setState(() => _playingAyahIndex = -1);
+                            },
+                          ),
+                      ],
+                    ),
                   ),
-                ),
-                Expanded(
-                  child: Container(
-                    color: const Color(0xFFFFFBF0),
-                    child: SingleChildScrollView(
-                      padding: const EdgeInsets.all(20),
-                      child: Column(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                            decoration: BoxDecoration(
-                              border: Border.all(color: const Color(0xFFB8922A), width: 2),
-                              borderRadius: BorderRadius.circular(8),
+                  Expanded(
+                    child: Container(
+                      color: const Color(0xFFFFFBF0),
+                      child: SingleChildScrollView(
+                        padding: const EdgeInsets.all(20),
+                        child: Column(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                              decoration: BoxDecoration(
+                                border: Border.all(color: const Color(0xFFB8922A), width: 2),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Column(
+                                children: [
+                                  Text(
+                                    'سورة ${widget.surah['name']}',
+                                    style: GoogleFonts.amiriQuran(
+                                      fontSize: 32,
+                                      fontWeight: FontWeight.bold,
+                                      color: const Color(0xFF8B6914),
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    '${widget.surah['revelationType'] == 'Meccan' ? 'مكية' : 'مدنية'} • ${widget.surah['numberOfAyahs']} آية',
+                                    style: GoogleFonts.amiri(
+                                      fontSize: 16,
+                                      color: Colors.grey.shade700,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ],
+                              ),
                             ),
-                            child: Column(
-                              children: [
-                                Text(
-                                  'سورة ${widget.surah['name']}',
+                            const SizedBox(height: 20),
+                            if (widget.surah['number'] != 9)
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 20),
+                                child: Text(
+                                  'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ',
                                   style: GoogleFonts.amiriQuran(
-                                    fontSize: 32,
-                                    fontWeight: FontWeight.bold,
+                                    fontSize: 28,
                                     color: const Color(0xFF8B6914),
+                                    height: 2,
                                   ),
+                                  textAlign: TextAlign.center,
                                 ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  '${widget.surah['revelationType'] == 'Meccan' ? 'مكية' : 'مدنية'} • ${widget.surah['numberOfAyahs']} آية',
-                                  style: GoogleFonts.amiri(
-                                    fontSize: 16,
-                                    color: Colors.grey.shade700,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 20),
-                          if (widget.surah['number'] != 9)
-                            Padding(
-                              padding: const EdgeInsets.only(bottom: 20),
-                              child: Text(
-                                'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ',
-                                style: GoogleFonts.amiriQuran(
-                                  fontSize: 28,
-                                  color: const Color(0xFF8B6914),
-                                  height: 2,
-                                ),
-                                textAlign: TextAlign.center,
-                                textDirection: TextDirection.rtl,
                               ),
-                            ),
-                          const Divider(color: Color(0xFFB8922A)),
-                          const SizedBox(height: 20),
-                          ..._ayahs.asMap().entries.map((entry) {
-                            final index = entry.key;
-                            final ayah = entry.value;
-                            final isPlaying = _playingAyahIndex == index;
+                            const Divider(color: Color(0xFFB8922A)),
+                            const SizedBox(height: 20),
+                            ..._ayahs.asMap().entries.map((entry) {
+                              final index = entry.key;
+                              final ayah = entry.value;
+                              final isPlaying = _playingAyahIndex == index;
 
-                            return GestureDetector(
-                              onTap: () => _playAyah(index),
-                              onLongPress: () => _showTafsirDialog(index),
-                              child: Container(
-                                margin: const EdgeInsets.only(bottom: 16),
-                                padding: const EdgeInsets.all(16),
-                                decoration: BoxDecoration(
-                                  color: isPlaying
-                                      ? const Color(0xFFB8922A).withOpacity(0.2)
-                                      : Colors.white,
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(
+                              return GestureDetector(
+                                onTap: () => _playAyah(index),
+                                onLongPress: () => _showTafsirDialog(index),
+                                child: Container(
+                                  margin: const EdgeInsets.only(bottom: 16),
+                                  padding: const EdgeInsets.all(16),
+                                  decoration: BoxDecoration(
                                     color: isPlaying
-                                        ? const Color(0xFFB8922A)
-                                        : Colors.grey.shade300,
-                                    width: isPlaying ? 2 : 1,
+                                        ? const Color(0xFFB8922A).withOpacity(0.2)
+                                        : Colors.white,
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                      color: isPlaying
+                                          ? const Color(0xFFB8922A)
+                                          : Colors.grey.shade300,
+                                      width: isPlaying ? 2 : 1,
+                                    ),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                  textDirection: TextDirection.rtl,
+                                    children: [
+                                      Text(
+                                        ayah['text'],
+                                        style: GoogleFonts.amiriQuran(
+                                          fontSize: 26,
+                                          height: 2.8,
+                                          color: isPlaying
+                                              ? const Color(0xFF8B6914)
+                                              : const Color(0xFF1A1A1A),
+                                        ),
+                                        textAlign: TextAlign.right,
+                                      ),
+                                      const SizedBox(height: 12),
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.end,
+                                        children: [
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                            decoration: BoxDecoration(
+                                              color: const Color(0xFFB8922A),
+                                              borderRadius: BorderRadius.circular(20),
+                                            ),
+                                            child: Text(
+                                              'آية ${_toArabicNumerals(ayah['numberInSurah'])}',
+                                              style: GoogleFonts.amiri(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 13,
+                                              ),
+                                            ),
+                                          ),
+                                          Row(
+                                            children: [
+                                              IconButton(
+                                                icon: Icon(
+                                                  isPlaying ? Icons.pause : Icons.play_arrow,
+                                                  color: isPlaying ? const Color(0xFFB8922A) : Colors.blue,
+                                                ),
+                                                onPressed: () => _playAyah(index),
+                                                tooltip: isPlaying ? 'إيقاف' : 'استماع',
+                                              ),
+                                              IconButton(
+                                                icon: const Icon(Icons.menu_book_outlined, color: Colors.green),
+                                                onPressed: () => _showTafsirDialog(index),
+                                                tooltip: 'التفسير',
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ],
                                   ),
                                 ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: [
-                                    Text(
-                                      ayah['text'],
-                                      style: GoogleFonts.amiriQuran(
-                                        fontSize: 26,
-                                        height: 2.8,
-                                        color: isPlaying
-                                            ? const Color(0xFF8B6914)
-                                            : const Color(0xFF1A1A1A),
-                                      ),
-                                      textAlign: TextAlign.right,
-                                      textDirection: TextDirection.rtl,
-                                    ),
-                                    const SizedBox(height: 12),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                          decoration: BoxDecoration(
-                                            color: const Color(0xFFB8922A),
-                                            borderRadius: BorderRadius.circular(20),
-                                          ),
-                                          child: Text(
-                                            'آية ${_toArabicNumerals(ayah['numberInSurah'])}',
-                                            style: GoogleFonts.amiri(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 13,
-                                            ),
-                                          ),
-                                        ),
-                                        Row(
-                                          children: [
-                                            IconButton(
-                                              icon: Icon(
-                                                isPlaying ? Icons.pause : Icons.play_arrow,
-                                                color: isPlaying ? const Color(0xFFB8922A) : Colors.blue,
-                                              ),
-                                              onPressed: () => _playAyah(index),
-                                              tooltip: isPlaying ? 'إيقاف' : 'استماع',
-                                            ),
-                                            IconButton(
-                                              icon: const Icon(Icons.menu_book_outlined, color: Colors.green),
-                                              onPressed: () => _showTafsirDialog(index),
-                                              tooltip: 'التفسير',
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          }).toList(),
-                        ],
+                              );
+                            }).toList(),
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
-            ),
+                ],
+              ),
+      ),
     );
   }
 
