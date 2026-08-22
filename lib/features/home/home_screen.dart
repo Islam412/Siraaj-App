@@ -28,12 +28,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   void _updateHijriDate() {
     final now = DateTime.now();
-    // تاريخ هجري تقريبي (يمكن استخدام مكتبة hijri لاحقاً)
     _hijriDate = DateFormat('dd MMMM yyyy', 'ar').format(now);
   }
 
   void _startCountdown() {
-    // وقت الصلاة التالية (مثال: الظهر 12:30)
     final now = DateTime.now();
     final nextPrayer = DateTime(now.year, now.month, now.day, 12, 30);
     
@@ -64,6 +62,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -76,6 +76,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ),
         centerTitle: true,
         actions: [
+          // زر تبديل الوضع الليلي/النهاري
+          IconButton(
+            icon: Icon(
+              isDark ? Icons.light_mode : Icons.dark_mode,
+              color: Colors.white,
+            ),
+            onPressed: () {
+              ref.read(themeModeProvider.notifier).toggleTheme();
+            },
+            tooltip: isDark ? 'الوضع النهاري' : 'الوضع الليلي',
+          ),
           IconButton(
             icon: const Icon(Icons.settings, color: Colors.white),
             onPressed: () => _showSettings(context),
@@ -83,16 +94,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ],
       ),
       body: Container(
-        color: const Color(0xFFF5F6F8),
+        color: isDark ? const Color(0xFF0B1623) : const Color(0xFFF5F6F8),
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
           child: Column(
             children: [
-              // Banner الصلاة التالية المحسّن
-              _buildPrayerBanner(context),
+              _buildPrayerBanner(context, isDark),
               const SizedBox(height: 20),
-              
-              // Grid الأيقونات
               GridView.count(
                 crossAxisCount: 2,
                 shrinkWrap: true,
@@ -222,7 +230,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  Widget _buildPrayerBanner(BuildContext context) {
+  Widget _buildPrayerBanner(BuildContext context, bool isDark) {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -246,7 +254,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ),
       child: Column(
         children: [
-          // التاريخ الهجري
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -262,8 +269,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ],
           ),
           const SizedBox(height: 16),
-          
-          // اسم الصلاة
           Text(
             'الصلاة التالية',
             style: TextStyle(
@@ -273,7 +278,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
           ),
           const SizedBox(height: 8),
-          
           Text(
             _nextPrayerName,
             style: const TextStyle(
@@ -283,8 +287,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
           ),
           const SizedBox(height: 16),
-          
-          // العد التنازلي
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
             decoration: BoxDecoration(
@@ -310,8 +312,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
           ),
           const SizedBox(height: 12),
-          
-          // وقت الصلاة
           Text(
             'الساعة $_nextPrayerTime',
             style: TextStyle(
@@ -331,6 +331,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     required String subtitle,
     required VoidCallback onTap,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(
@@ -341,9 +343,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         borderRadius: BorderRadius.circular(16),
         child: Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: isDark ? const Color(0xFF132033) : Colors.white,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.grey.shade100),
+            border: Border.all(
+              color: isDark ? const Color(0xFF1E3A5F) : Colors.grey.shade100,
+            ),
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -353,16 +357,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 width: 48,
                 height: 48,
                 errorBuilder: (context, error, stackTrace) {
-                  return Icon(Icons.error, color: Colors.grey.shade400);
+                  return Icon(
+                    Icons.error,
+                    color: isDark ? Colors.grey.shade600 : Colors.grey.shade400,
+                  );
                 },
               ),
               const SizedBox(height: 8),
               Text(
                 title,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFF1565A8),
+                  color: isDark ? const Color(0xFF2180CC) : const Color(0xFF1565A8),
                 ),
               ),
               const SizedBox(height: 4),
@@ -370,7 +377,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 subtitle,
                 style: TextStyle(
                   fontSize: 11,
-                  color: Colors.grey.shade600,
+                  color: isDark ? Colors.grey.shade500 : Colors.grey.shade600,
                 ),
               ),
             ],
@@ -381,36 +388,32 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   void _showSettings(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     showModalBottomSheet(
       context: context,
-      builder: (context) => Consumer(
-        builder: (context, ref, child) {
-          final currentTheme = ref.watch(themeModeProvider);
-          return Container(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'الإعدادات',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 24),
-                SwitchListTile(
-                  title: const Text('الوضع الليلي'),
-                  subtitle: const Text('تفعيل الوضع الداكن'),
-                  value: currentTheme == ThemeMode.dark,
-                  onChanged: (value) {
-                    ref.read(themeModeProvider.notifier).state =
-                        value ? ThemeMode.dark : ThemeMode.light;
-                    Navigator.pop(context);
-                  },
-                ),
-              ],
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'الإعدادات',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-          );
-        },
+            const SizedBox(height: 24),
+            SwitchListTile(
+              title: const Text('الوضع الليلي'),
+              subtitle: const Text('تفعيل الوضع الداكن'),
+              value: isDark,
+              onChanged: (value) {
+                ref.read(themeModeProvider.notifier).toggleTheme();
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
