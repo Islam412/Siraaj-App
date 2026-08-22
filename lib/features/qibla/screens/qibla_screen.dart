@@ -1,9 +1,10 @@
 import 'dart:async';
+import 'dart:io' show Platform;
 import 'dart:math' as math;
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:sensors_plus/sensors_plus.dart';
 import '../services/qibla_service.dart';
 
 class QiblaScreen extends StatefulWidget {
@@ -15,169 +16,259 @@ class QiblaScreen extends StatefulWidget {
 
 class _QiblaScreenState extends State<QiblaScreen> {
   double _qiblaDirection = 0.0;
-  double _deviceDirection = 0.0;
   double _distanceToKaaba = 0.0;
   Position? _currentPosition;
   bool _isLoading = true;
   String? _errorMessage;
-  StreamSubscription? _magnetometerSubscription;
+  bool _isDesktop = false;
 
   @override
   void initState() {
     super.initState();
-    _initializeQibla();
+    _isDesktop = !kIsWeb && (Platform.isLinux || Platform.isWindows || Platform.isMacOS);
+    _loadQibla();
   }
 
-  Future<void> _initializeQibla() async {
+  Future<void> _loadQibla() async {
     try {
-      final permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        final requested = await Geolocator.requestPermission();
-        if (requested == LocationPermission.denied) {
-          setState(() { _errorMessage = 'يرجى منح إذن الموقع'; _isLoading = false; });
-          return;
-        }
+      bool serviceEnabled = false;
+      try {
+        serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      } catch (_) {}
+
+      if (!serviceEnabled) {
+        setState(() {
+          _qiblaDirection = 0.0;
+          _distanceToKaaba = 0.0;
+          _isLoading = false;
+          _errorMessage = 'خدمة الموقع غير متاحة. يتم عرض اتجاه القبلة الافتراضي.';
+        });
+        return;
       }
-      final position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-      setState(() {
-        _currentPosition = position;
-        _distanceToKaaba = QiblaService.calculateDistance(position.latitude, position.longitude);
-        _qiblaDirection = QiblaService.calculateQiblaDirection(position.latitude, position.longitude);
-        _isLoading = false;
-      });
-      _startCompass();
-    } catch (e) {
-      setState(() { _errorMessage = 'حدث خطأ: \$e'; _isLoading = false; });
-    }
-  }
 
-  void _startCompass() {
-    _magnetometerSubscription = magnetometerEventStream().listen((MagnetometerEvent event) {
-      setState(() {
-        // حساب الاتجاه التقريبي بناءً على مقياس المغناطيسية (بافتراض أن الجهاز مسطح)
-        double heading = (math.atan2(event.y, event.x) * 180 / math.pi);
-        if (heading < 0) {
-          heading += 360;
+      var permission = LocationPermission.denied;
+      try {
+        permission = await Geolocator.checkPermission();
+        if (permission == LocationPermission.denied) {
+          permission = await Geolocator.requestPermission();
         }
-        _deviceDirection = heading;
-      });
-    });
-  }
+      } catch (_) {}
 
-  @override
-  void dispose() {
-    _magnetometerSubscription?.cancel();
-    super.dispose();
+      if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
+        setState(() {
+          _qiblaDirection = 0.0;
+          _distanceToKaaba = 0.0;
+          _isLoading = false;
+          _errorMessage = 'إذن الموقع مرفوض. يتم عرض اتجاه القبلة الافتراضي.';
+        });
+        return;
+      }
+
+      try {
+        final position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high,
+          timeLimit: const Duration(seconds: 5),
+        );
+
+        setState(() {
+          _currentPosition = position;
+          _distanceToKaaba = QiblaService.calculateDistance(position.latitude, position.longitude);
+          _qiblaDirection = QiblaService.calculateQiblaDirection(position.latitude, position.longitude);
+          _isLoading = false;
+        });
+      } catch (e) {
+        setState(() {
+          _qiblaDirection = 0.0;
+          _distanceToKaaba = 0.0;
+          _isLoading = false;
+          _errorMessage = 'تعذر الحصول على الموقع. يتم عرض اتجاه القبلة الافتراضي.';
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _qiblaDirection = 0.0;
+        _distanceToKaaba = 0.0;
+        _isLoading = false;
+        _errorMessage = 'حدث خطأ: \$e';
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('القبلة', style: GoogleFonts.amiri(fontSize: 24, fontWeight: FontWeight.bold)),
+        title: const Text('القبلة', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
         centerTitle: true,
+        backgroundColor: const Color(0xFF1E3A5F),
+        foregroundColor: Colors.white,
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : _errorMessage != null
-              ? Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                  const Icon(Icons.error, size: 64, color: Colors.red),
-                  const SizedBox(height: 16),
-                  Text(_errorMessage!, style: GoogleFonts.amiri(fontSize: 18), textAlign: TextAlign.center),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () { setState(() { _isLoading = true; _errorMessage = null; }); _initializeQibla(); }, 
-                    child: const Text('إعادة المحاولة'),
-                  ),
-                ]))
-              : _buildContent(),
+          : _buildContent(),
     );
   }
 
   Widget _buildContent() {
-    final angleDifference = (_qiblaDirection - _deviceDirection) % 360;
-    final normalizedAngle = angleDifference < 0 ? angleDifference + 360 : angleDifference;
-
-    return Column(
-      children: [
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(16),
-          color: Theme.of(context).colorScheme.surface,
-          child: Column(
-            children: [
-              Text('المسافة إلى الكعبة', style: GoogleFonts.amiri(fontSize: 16, color: Colors.grey)),
-              const SizedBox(height: 8),
-              Text('\${_distanceToKaaba.toStringAsFixed(1)} كم', style: GoogleFonts.amiri(fontSize: 24, fontWeight: FontWeight.bold, color: const Color(0xFFB8922A))),
-            ],
-          ),
-        ),
-        const SizedBox(height: 20),
-        Expanded(
-          child: Center(
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                Transform.rotate(angle: _deviceDirection * math.pi / 180, child: _buildCompassRose()),
-                Transform.rotate(
-                  angle: _qiblaDirection * math.pi / 180,
-                  child: Container(
-                    width: 300, height: 300,
-                    child: Stack(alignment: Alignment.topCenter, children: [
-                      Positioned(top: 20, child: Column(children: [
-                        const Icon(Icons.place, size: 40, color: Color(0xFF1565A8)),
-                        const SizedBox(height: 4),
-                        Text('القبلة', style: GoogleFonts.amiri(fontSize: 16, fontWeight: FontWeight.bold, color: const Color(0xFF1565A8))),
-                      ])),
-                    ]),
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        children: [
+          if (_errorMessage != null) ...[
+            Container(
+              padding: const EdgeInsets.all(15),
+              decoration: BoxDecoration(
+                color: Colors.orange.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.orange),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.info_outline, color: Colors.orange),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      _errorMessage!,
+                      style: const TextStyle(color: Colors.white),
+                    ),
                   ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+          ],
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [Color(0xFF1E3A5F), Color(0xFF2E5A8F)],
+              ),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Column(
+              children: [
+                const Icon(Icons.place, color: Colors.white, size: 50),
+                const SizedBox(height: 10),
+                const Text('المسافة إلى الكعبة', style: TextStyle(fontSize: 18, color: Colors.white70)),
+                const SizedBox(height: 10),
+                Text(
+                  _distanceToKaaba > 0 ? '\${_distanceToKaaba.toStringAsFixed(1)} كم' : '0.0 كم (مكة المكرمة)',
+                  style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Color(0xFFB8922A)),
                 ),
-                Container(width: 20, height: 20, decoration: const BoxDecoration(shape: BoxShape.circle, color: Color(0xFFB8922A))),
+                if (_currentPosition != null) ...[
+                  const SizedBox(height: 10),
+                  Text(
+                    'موقعك: \${_currentPosition!.latitude.toStringAsFixed(3)}, \${_currentPosition!.longitude.toStringAsFixed(3)}',
+                    style: const TextStyle(fontSize: 12, color: Colors.white60),
+                  ),
+                ],
               ],
             ),
           ),
-        ),
-        Container(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            children: [
-              Text('وجّه هاتفك حتى يتطابق سهم القبلة مع الشمال', style: GoogleFonts.amiri(fontSize: 16, color: Colors.grey.shade700), textAlign: TextAlign.center),
-              const SizedBox(height: 8),
-              Text('الانحراف: \${normalizedAngle.toStringAsFixed(1)}°', style: GoogleFonts.amiri(fontSize: 14, color: normalizedAngle < 5 ? Colors.green : Colors.orange, fontWeight: FontWeight.bold)),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildCompassRose() {
-    // تحديد نوع البيانات لمنع أخطاء Object
-    final List<Map<String, dynamic>> directions = [
-      {'label': 'N', 'angle': 0.0},
-      {'label': 'E', 'angle': 90.0},
-      {'label': 'S', 'angle': 180.0},
-      {'label': 'W', 'angle': 270.0},
-    ];
-
-    return SizedBox(
-      width: 300, height: 300,
-      child: Stack(alignment: Alignment.center, children: [
-        Container(width: 280, height: 280, decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: Colors.grey.shade300, width: 2))),
-        ...directions.map((direction) {
-          final double angle = (direction['angle'] as double) * math.pi / 180;
-          final double radius = 120.0;
-          final double x = radius * math.sin(angle);
-          final double y = -radius * math.cos(angle);
-          return Positioned(
-            left: 140 + x - 15, top: 140 + y - 15,
-            child: Container(
-              width: 30, height: 30, decoration: const BoxDecoration(shape: BoxShape.circle, color: Color(0xFF1565A8)),
-              child: Center(child: Text(direction['label'] as String, style: GoogleFonts.amiri(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16))),
+          const SizedBox(height: 25),
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.05),
+              borderRadius: BorderRadius.circular(16),
             ),
-          );
-        }).toList(),
-      ]),
+            child: Column(
+              children: [
+                const Text('اتجاه القبلة', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white)),
+                const SizedBox(height: 20),
+                SizedBox(
+                  height: 300,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Container(
+                        width: 280,
+                        height: 280,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white24, width: 3),
+                          color: Colors.white.withOpacity(0.05),
+                        ),
+                      ),
+                      ...[
+                        {'label': 'N', 'angle': 0.0},
+                        {'label': 'E', 'angle': 90.0},
+                        {'label': 'S', 'angle': 180.0},
+                        {'label': 'W', 'angle': 270.0},
+                      ].map((dir) {
+                        final angle = (dir['angle'] as double) * math.pi / 180;
+                        final radius = 120.0;
+                        final x = radius * math.sin(angle);
+                        final y = -radius * math.cos(angle);
+                        return Positioned(
+                          left: 140 + x - 20,
+                          top: 140 + y - 20,
+                          child: Container(
+                            width: 40,
+                            height: 40,
+                            decoration: const BoxDecoration(shape: BoxShape.circle, color: Color(0xFF1565A8)),
+                            child: Center(
+                              child: Text(
+                                dir['label'] as String,
+                                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
+                              ),
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                      Transform.rotate(
+                        angle: _qiblaDirection * math.pi / 180,
+                        child: const Positioned(
+                          top: 20,
+                          child: Column(
+                            children: [
+                              Icon(Icons.place, size: 45, color: Color(0xFF1565A8)),
+                              SizedBox(height: 4),
+                              Text('القبلة', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF1565A8))),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Container(
+                        width: 20,
+                        height: 20,
+                        decoration: const BoxDecoration(shape: BoxShape.circle, color: Color(0xFFB8922A)),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Container(
+                  padding: const EdgeInsets.all(15),
+                  decoration: BoxDecoration(
+                    color: Colors.green.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Column(
+                    children: [
+                      const Icon(Icons.check_circle_outline, color: Colors.green, size: 30),
+                      const SizedBox(height: 10),
+                      Text(
+                        'اتجاه القبلة: \${_qiblaDirection.toStringAsFixed(1)}°',
+                        style: const TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
+                      ),
+                      if (_isDesktop) ...[
+                        const SizedBox(height: 5),
+                        const Text(
+                          'لتجربة البوصلة التفاعلية، استخدم التطبيق على الموبايل',
+                          style: TextStyle(fontSize: 11, color: Colors.white60),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
