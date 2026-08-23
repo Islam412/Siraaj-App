@@ -49,10 +49,17 @@ class PrayerTimeService {
     };
   }
 
-  static String formatTime(DateTime time) {
-    final hour = time.hour;
-    final minute = time.minute;
-    return '${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}';
+  // دالة تنسيق الوقت الجديدة التي تدعم 12 و 24 ساعة
+  static String formatTime(DateTime time, bool is24Hour) {
+    if (is24Hour) {
+      return '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
+    } else {
+      int hour = time.hour;
+      String period = hour >= 12 ? 'م' : 'ص';
+      hour = hour % 12;
+      if (hour == 0) hour = 12;
+      return '$hour:${time.minute.toString().padLeft(2, '0')} $period';
+    }
   }
 
   static Duration getTimeRemaining(DateTime prayerTime) {

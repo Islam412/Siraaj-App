@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../services/prayer_time_service.dart';
 import '../data/cities_data.dart';
 import 'package:adhan/adhan.dart';
@@ -25,12 +26,67 @@ class _PrayerScreenState extends ConsumerState<PrayerScreen> {
   Timer? _timer;
   String _nextPrayer = '';
   Duration _timeRemaining = Duration.zero;
+  
+  // متغير نظام الوقت (الافتراضي 24 ساعة)
+  bool _is24HourFormat = true;
 
   @override
   void initState() {
     super.initState();
+    _loadSettings();
     _initializePrayerTimes();
     _startTimer();
+  }
+
+  Future<void> _loadSettings() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _is24HourFormat = prefs.getBool('is24HourFormat') ?? true;
+    });
+  }
+
+  Future<void> _toggleTimeFormat() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _is24HourFormat = !_is24HourFormat;
+    });
+    await prefs.setBool('is24HourFormat', _is24HourFormat);
+  }
+
+  void _showSettingsDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF0B1623),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        title: Text(
+          'إعدادات العرض',
+          style: GoogleFonts.amiri(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+        ),
+        content: SwitchListTile(
+          title: Text(
+            'نظام 24 ساعة',
+            style: GoogleFonts.amiri(fontSize: 16, color: Colors.white),
+          ),
+          subtitle: Text(
+            _is24HourFormat ? 'مفعل (مثال: 14:30)' : 'معطل (مثال: 2:30 م)',
+            style: GoogleFonts.amiri(fontSize: 12, color: Colors.white70),
+          ),
+          value: _is24HourFormat,
+          activeColor: const Color(0xFFB8922A),
+          onChanged: (value) {
+            Navigator.pop(context);
+            _toggleTimeFormat();
+          },
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('إغلاق', style: GoogleFonts.amiri(color: const Color(0xFFB8922A))),
+          ),
+        ],
+      ),
+    );
   }
 
   void _startTimer() {
@@ -174,6 +230,11 @@ class _PrayerScreenState extends ConsumerState<PrayerScreen> {
         centerTitle: true,
         actions: [
           IconButton(
+            icon: const Icon(Icons.settings),
+            tooltip: 'إعدادات الوقت',
+            onPressed: _showSettingsDialog,
+          ),
+          IconButton(
             icon: Icon(_isManualLocation ? Icons.location_off : Icons.my_location),
             tooltip: _isManualLocation ? 'استخدام الموقع الحالي' : 'تحديد مدينة يدوياً',
             onPressed: () {
@@ -303,11 +364,12 @@ class _PrayerScreenState extends ConsumerState<PrayerScreen> {
           const SizedBox(height: 12),
           Text(
             _prayerTimes[_nextPrayer] != null
-                ? PrayerTimeService.formatTime(_prayerTimes[_nextPrayer]!)
+                ? PrayerTimeService.formatTime(_prayerTimes[_nextPrayer]!, _is24HourFormat)
                 : '',
             style: GoogleFonts.amiri(
-              fontSize: 14,
+              fontSize: 16,
               color: Colors.white.withOpacity(0.9),
+              fontWeight: FontWeight.bold,
             ),
           ),
         ],
@@ -383,7 +445,9 @@ class _PrayerScreenState extends ConsumerState<PrayerScreen> {
                   ),
                 const SizedBox(width: 12),
                 Text(
-                  prayerTime != null ? PrayerTimeService.formatTime(prayerTime) : '--:--',
+                  prayerTime != null 
+                      ? PrayerTimeService.formatTime(prayerTime, _is24HourFormat) 
+                      : '--:--',
                   style: GoogleFonts.amiri(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
