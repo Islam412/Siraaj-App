@@ -167,10 +167,7 @@ class _TasbihScreenState extends State<TasbihScreen> {
   }
 
   void _moveToNextZikr() {
-    // الانتقال للذكر التالي
     int nextIndex = _selectedIndex + 1;
-    
-    // إذا وصلنا لآخر ذكر، نعود للأول
     if (nextIndex >= _allAzkar.length) {
       nextIndex = 0;
     }
@@ -182,11 +179,11 @@ class _TasbihScreenState extends State<TasbihScreen> {
     
     _saveData();
     
-    // عرض رسالة الانتقال
+    final currentZikr = _allAzkar[_selectedIndex];
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          'الانتقال إلى: \${_allAzkar[_selectedIndex]["text"]}',
+          'الانتقال إلى: \${currentZikr["text"]}',
           style: GoogleFonts.amiri(fontSize: 16),
         ),
         backgroundColor: const Color(0xFF1565A8),
@@ -302,6 +299,187 @@ class _TasbihScreenState extends State<TasbihScreen> {
     );
   }
 
+  void _showEditZikrDialog(int index) {
+    final zikr = _customAzkar[index - _defaultAzkar.length];
+    final textController = TextEditingController(text: zikr['text']);
+    final virtueController = TextEditingController(text: zikr['virtue'] ?? '');
+    final targetController = TextEditingController(text: zikr['target'].toString());
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF1E3A5F),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        title: Text(
+          'تعديل الذكر',
+          style: GoogleFonts.amiri(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white),
+        ),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: textController,
+                style: GoogleFonts.amiri(color: Colors.white, fontSize: 18),
+                decoration: InputDecoration(
+                  labelText: 'نص الذكر',
+                  labelStyle: GoogleFonts.amiri(color: Colors.white70),
+                  filled: true,
+                  fillColor: Colors.white.withOpacity(0.1),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                ),
+                maxLines: 2,
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: virtueController,
+                style: GoogleFonts.amiri(color: Colors.white),
+                decoration: InputDecoration(
+                  labelText: 'فضل الذكر (اختياري)',
+                  labelStyle: GoogleFonts.amiri(color: Colors.white70),
+                  filled: true,
+                  fillColor: Colors.white.withOpacity(0.1),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                ),
+                maxLines: 3,
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: targetController,
+                style: GoogleFonts.amiri(color: Colors.white),
+                decoration: InputDecoration(
+                  labelText: 'العدد المستهدف',
+                  labelStyle: GoogleFonts.amiri(color: Colors.white70),
+                  filled: true,
+                  fillColor: Colors.white.withOpacity(0.1),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                ),
+                keyboardType: TextInputType.number,
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('إلغاء', style: GoogleFonts.amiri(color: Colors.white70)),
+          ),
+          TextButton(
+            onPressed: () {
+              if (textController.text.isNotEmpty) {
+                setState(() {
+                  _customAzkar[index - _defaultAzkar.length] = {
+                    'text': textController.text,
+                    'translation': '',
+                    'virtue': virtueController.text,
+                    'target': int.tryParse(targetController.text) ?? 33,
+                  };
+                });
+                _saveData();
+                Navigator.pop(context);
+              }
+            },
+            child: Text('حفظ', style: GoogleFonts.amiri(color: const Color(0xFFB8922A), fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showDeleteZikrDialog(int index) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF1E3A5F),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        title: Row(
+          children: [
+            const Icon(Icons.warning, color: Colors.amber, size: 28),
+            const SizedBox(width: 10),
+            Text(
+              'حذف الذكر',
+              style: GoogleFonts.amiri(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white),
+            ),
+          ],
+        ),
+        content: Text(
+          'هل أنت متأكد من حذف هذا الذكر؟',
+          style: GoogleFonts.amiri(fontSize: 16, color: Colors.white70),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('إلغاء', style: GoogleFonts.amiri(color: Colors.white70)),
+          ),
+          TextButton(
+            onPressed: () {
+              setState(() {
+                _customAzkar.removeAt(index - _defaultAzkar.length);
+                if (_selectedIndex >= _allAzkar.length) {
+                  _selectedIndex = 0;
+                }
+                _count = 0;
+              });
+              _saveData();
+              Navigator.pop(context);
+              
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('تم حذف الذكر', style: GoogleFonts.amiri(fontSize: 16)),
+                  backgroundColor: Colors.green,
+                ),
+              );
+            },
+            child: Text('حذف', style: GoogleFonts.amiri(color: Colors.red, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showManageZikrDialog(int index) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF1E3A5F),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.3),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 20),
+            ListTile(
+              leading: const Icon(Icons.edit, color: Color(0xFFB8922A)),
+              title: Text('تعديل', style: GoogleFonts.amiri(fontSize: 18, color: Colors.white)),
+              onTap: () {
+                Navigator.pop(context);
+                _showEditZikrDialog(index);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.delete, color: Colors.red),
+              title: Text('حذف', style: GoogleFonts.amiri(fontSize: 18, color: Colors.white)),
+              onTap: () {
+                Navigator.pop(context);
+                _showDeleteZikrDialog(index);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final currentZikr = _allAzkar[_selectedIndex];
@@ -335,8 +513,11 @@ class _TasbihScreenState extends State<TasbihScreen> {
               itemBuilder: (context, index) {
                 final isSelected = index == _selectedIndex;
                 final zikr = _allAzkar[index];
+                final isCustom = index >= _defaultAzkar.length;
+                
                 return GestureDetector(
                   onTap: () => _selectZikr(index),
+                  onLongPress: isCustom ? () => _showManageZikrDialog(index) : null,
                   child: Container(
                     margin: const EdgeInsets.symmetric(horizontal: 6),
                     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -348,15 +529,26 @@ class _TasbihScreenState extends State<TasbihScreen> {
                         width: 2,
                       ),
                     ),
-                    child: Center(
-                      child: Text(
-                        zikr['text'] as String,
-                        style: GoogleFonts.amiri(
-                          fontSize: 16,
-                          color: isSelected ? Colors.white : Colors.white70,
-                          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          zikr['text'] as String,
+                          style: GoogleFonts.amiri(
+                            fontSize: 16,
+                            color: isSelected ? Colors.white : Colors.white70,
+                            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                          ),
                         ),
-                      ),
+                        if (isCustom) ...[
+                          const SizedBox(width: 5),
+                          Icon(
+                            Icons.edit,
+                            size: 14,
+                            color: isSelected ? Colors.white.withOpacity(0.7) : Colors.white.withOpacity(0.4),
+                          ),
+                        ],
+                      ],
                     ),
                   ),
                 );
