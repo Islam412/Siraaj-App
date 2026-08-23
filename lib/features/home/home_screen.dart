@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:adhan/adhan.dart';
+import 'package:geolocator/geolocator.dart';
 import '../../core/providers/settings_provider.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -19,11 +21,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   String _nextPrayerName = 'الظهر';
   String _nextPrayerTime = '12:30';
   String _hijriDate = '';
+  Position? _currentPosition;
+  Map<String, DateTime>? _prayerTimes;
 
   @override
   void initState() {
     super.initState();
     _updateHijriDate();
+    _initializePrayerTimes();
     _startCountdown();
   }
 
@@ -32,27 +37,123 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     _hijriDate = DateFormat('dd MMMM yyyy', 'ar').format(now);
   }
 
-  void _startCountdown() {
-    final now = DateTime.now();
-    final nextPrayer = DateTime(now.year, now.month, now.day, 12, 30);
-    
-    _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      final currentTime = DateTime.now();
-      final remaining = nextPrayer.difference(currentTime);
-      
-      if (mounted) {
-        setState(() {
-          _timeRemaining = remaining > Duration.zero ? remaining : Duration.zero;
-        });
+  Future<void> _initializePrayerTimes() async {
+    try {
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (serviceEnabled) {
+        var permission = await Geolocator.checkPermission();
+        if (permission == LocationPermission.denied) {
+          permission = await Geolocator.requestPermission();
+        }
+
+        if (permission != LocationPermission.denied) {
+          final position = await Geolocator.getCurrentPosition(
+            desiredAccuracy: LocationAccuracy.high,
+          );
+
+          setState(() {
+            _currentPosition = position;
+          });
+
+          await _calculatePrayerTimes();
+        }
       }
+    } catch (e) {
+      // Use default location (Makkah)
+      setState(() {
+        _currentPosition = Position(
+          latitude: 21.3891,
+          longitude: 39.8579,
+          timestamp: DateTime.now(),
+          accuracy: 0.0,
+          altitude: 0.0,
+          altitudeAccuracy: 0.0,
+          heading: 0.0,
+          headingAccuracy: 0.0,
+          speed: 0.0,
+          speedAccuracy: 0.0,
+        );
+      });
+      await _calculatePrayerTimes();
+    }
+  }
+
+  Future<void> _calculatePrayerTimes() async {
+    if (_currentPosition == null) return;
+
+    try {
+      final coordinates = Coordinates(
+        _currentPosition!.latitude,
+        _currentPosition!.longitude,
+      );
+      final params = CalculationMethod.umm_al_qura.getParameters();
+      final dateComponents = DateComponents.from(DateTime.now());
+      final prayerTimes = PrayerTimes(coordinates, dateComponents, params);
+
+      setState(() {
+        _prayerTimes = {
+          'Fajr': prayerTimes.fajr,
+          'Sunrise': prayerTimes.sunrise,
+          'Dhuhr': prayerTimes.dhuhr,
+          'Asr': prayerTimes.asr,
+          'Maghrib': prayerTimes.maghrib,
+          'Isha': prayerTimes.isha,
+        };
+        _updateNextPrayer();
+      });
+    } catch (e) {
+      // Default times
+      setState(() {
+        _prayerTimes = {
+          'Fajr': DateTime.now().copyWith(hour: 5, minute: 0),
+          'Dhuhr': DateTime.now().copyWith(hour: 12, minute: 30),
+          'Asr': DateTime.now().copyWith(hour: 15, minute: 45),
+          'Maghrib': DateTime.now().copyWith(hour: 18, minute: 15),
+          'Isha': DateTime.now().copyWith(hour: 19, minute: 45),
+        };
+        _updateNextPrayer();
+      });
+    }
+  }
+
+  void _updateNextPrayer() {
+    if (_prayerTimes == null) return;
+
+    final now = DateTime.now();
+    final prayers = ['Fajr', 'Sunrise', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
+    final arabicNames = {
+      'Fajr': 'الفجر',
+      'Sunrise': 'الشروق',
+      'Dhuhr': 'الظهر',
+      'Asr': 'العصر',
+      'Maghrib': 'المغرب',
+      'Isha': 'العشاء',
+    };
+
+    String nextPrayer = 'Fajr';
+    for (var prayer in prayers) {
+      if (_prayerTimes![prayer]!.isAfter(now)) {
+        nextPrayer = prayer;
+        break;
+      }
+    }
+
+    final nextPrayerTime = _prayerTimes![nextPrayer]!;
+    final remaining = nextPrayerTime.difference(now);
+
+    setState(() {
+      _nextPrayerName = arabicNames[nextPrayer]!;
+      _nextPrayerTime = DateFormat('HH:mm').format(nextPrayerTime);
+      _timeRemaining = remaining > Duration.zero ? remaining : Duration.zero;
     });
   }
 
-  String _formatDuration(Duration duration) {
-    final hours = duration.inHours;
-    final minutes = duration.inMinutes.remainder(60);
-    final seconds = duration.inSeconds.remainder(60);
-    return '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
+  void _startCountdown() {
+    _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (_prayerTimes != null) {
+        _updateNextPrayer();
+      }
+    });
   }
 
   @override
@@ -61,26 +162,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     super.dispose();
   }
 
-  double _getIconSize(double screenWidth) {
-    if (screenWidth < 400) return 64;
-    if (screenWidth < 600) return 72;
-    if (screenWidth < 900) return 80;
-    if (screenWidth < 1200) return 96;
-    return 120;
-  }
-
-  int _getCrossAxisCount(double screenWidth) {
-    if (screenWidth < 400) return 2;
-    if (screenWidth < 600) return 2;
-    if (screenWidth < 900) return 3;
-    if (screenWidth < 1200) return 4;
-    return 5;
-  }
-
-  double _getChildAspectRatio(double screenWidth) {
-    if (screenWidth < 600) return 0.85;
-    if (screenWidth < 900) return 0.95;
-    return 1.0;
+  String _formatDuration(Duration duration) {
+    final hours = duration.inHours;
+    final minutes = duration.inMinutes.remainder(60);
+    final seconds = duration.inSeconds.remainder(60);
+    return '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
   }
 
   @override
@@ -278,6 +364,28 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
+  double _getIconSize(double screenWidth) {
+    if (screenWidth < 400) return 64;
+    if (screenWidth < 600) return 72;
+    if (screenWidth < 900) return 80;
+    if (screenWidth < 1200) return 96;
+    return 120;
+  }
+
+  int _getCrossAxisCount(double screenWidth) {
+    if (screenWidth < 400) return 2;
+    if (screenWidth < 600) return 2;
+    if (screenWidth < 900) return 3;
+    if (screenWidth < 1200) return 4;
+    return 5;
+  }
+
+  double _getChildAspectRatio(double screenWidth) {
+    if (screenWidth < 600) return 0.85;
+    if (screenWidth < 900) return 0.95;
+    return 1.0;
+  }
+
   Widget _buildPrayerBanner(BuildContext context, bool isDark) {
     return Container(
       padding: const EdgeInsets.all(24),
@@ -328,7 +436,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           const SizedBox(height: 8),
           Text(
             _nextPrayerName,
-            style: GoogleFonts.amiriQuran(
+            style: GoogleFonts.amiri(
               color: Colors.white,
               fontSize: 40,
               fontWeight: FontWeight.bold,
