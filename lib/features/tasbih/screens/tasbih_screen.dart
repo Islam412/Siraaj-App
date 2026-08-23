@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 
 class TasbihScreen extends StatefulWidget {
   const TasbihScreen({super.key});
@@ -87,13 +88,7 @@ class _TasbihScreenState extends State<TasbihScreen> {
     final customAzkarJson = prefs.getStringList('custom_azkar') ?? [];
     setState(() {
       _customAzkar = customAzkarJson.map((json) {
-        final parts = json.split('|');
-        return {
-          'text': parts[0],
-          'translation': parts.length > 1 ? parts[1] : '',
-          'virtue': parts.length > 2 ? parts[2] : '',
-          'target': parts.length > 3 ? int.parse(parts[3]) : 33,
-        };
+        return jsonDecode(json) as Map<String, dynamic>;
       }).toList();
     });
 
@@ -112,7 +107,7 @@ class _TasbihScreenState extends State<TasbihScreen> {
     final prefs = await SharedPreferences.getInstance();
     
     final customAzkarJson = _customAzkar.map((zikr) {
-      return '${zikr['text']}|${zikr['translation'] ?? ''}|${zikr['virtue'] ?? ''}|${zikr['target']}';
+      return jsonEncode(zikr);
     }).toList();
     await prefs.setStringList('custom_azkar', customAzkarJson);
     
@@ -249,16 +244,19 @@ class _TasbihScreenState extends State<TasbihScreen> {
           TextButton(
             onPressed: () {
               if (textController.text.isNotEmpty) {
+                final newZikr = {
+                  'text': textController.text,
+                  'translation': '',
+                  'virtue': virtueController.text,
+                  'target': int.tryParse(targetController.text) ?? 33,
+                };
+                
                 setState(() {
-                  _customAzkar.add({
-                    'text': textController.text,
-                    'translation': '',
-                    'virtue': virtueController.text,
-                    'target': int.tryParse(targetController.text) ?? 33,
-                  });
+                  _customAzkar.add(newZikr);
                   _selectedIndex = _allAzkar.length - 1;
                   _count = 0;
                 });
+                
                 _saveData();
                 Navigator.pop(context);
               }
@@ -293,7 +291,6 @@ class _TasbihScreenState extends State<TasbihScreen> {
       ),
       body: Column(
         children: [
-          // أزرار الأذكار
           Container(
             height: 100,
             color: const Color(0xFF132033),
@@ -338,7 +335,6 @@ class _TasbihScreenState extends State<TasbihScreen> {
               padding: const EdgeInsets.all(20),
               child: Column(
                 children: [
-                  // العنوان
                   Text(
                     'المسبحة الإلكترونية',
                     style: GoogleFonts.amiri(
@@ -349,7 +345,6 @@ class _TasbihScreenState extends State<TasbihScreen> {
                   ),
                   const SizedBox(height: 30),
 
-                  // العداد الدائري
                   Stack(
                     alignment: Alignment.center,
                     children: [
@@ -409,7 +404,6 @@ class _TasbihScreenState extends State<TasbihScreen> {
                   ),
                   const SizedBox(height: 30),
 
-                  // بطاقة الذكر
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(24),
@@ -473,7 +467,6 @@ class _TasbihScreenState extends State<TasbihScreen> {
                   ),
                   const SizedBox(height: 20),
 
-                  // شريط التقدم
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -489,7 +482,6 @@ class _TasbihScreenState extends State<TasbihScreen> {
                   ),
                   const SizedBox(height: 20),
 
-                  // زر إعادة التعيين
                   ElevatedButton.icon(
                     onPressed: _resetCount,
                     icon: const Icon(Icons.refresh),
