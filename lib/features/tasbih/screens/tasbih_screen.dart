@@ -127,20 +127,14 @@ class _TasbihScreenState extends State<TasbihScreen> {
     final target = _allAzkar[_selectedIndex]['target'] as int;
     if (_count >= target) {
       HapticFeedback.heavyImpact();
-      _showCompletionDialog();
+      _showCompletionDialogAndMoveNext();
     }
   }
 
-  void _resetCount() {
-    setState(() {
-      _count = 0;
-    });
-    _saveData();
-  }
-
-  void _showCompletionDialog() {
+  void _showCompletionDialogAndMoveNext() {
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (context) => AlertDialog(
         backgroundColor: const Color(0xFF1E3A5F),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
@@ -161,12 +155,52 @@ class _TasbihScreenState extends State<TasbihScreen> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('متابعة', style: GoogleFonts.amiri(color: const Color(0xFFB8922A), fontWeight: FontWeight.bold)),
+            onPressed: () {
+              Navigator.pop(context);
+              _moveToNextZikr();
+            },
+            child: Text('التالي', style: GoogleFonts.amiri(color: const Color(0xFFB8922A), fontWeight: FontWeight.bold)),
           ),
         ],
       ),
     );
+  }
+
+  void _moveToNextZikr() {
+    // الانتقال للذكر التالي
+    int nextIndex = _selectedIndex + 1;
+    
+    // إذا وصلنا لآخر ذكر، نعود للأول
+    if (nextIndex >= _allAzkar.length) {
+      nextIndex = 0;
+    }
+    
+    setState(() {
+      _selectedIndex = nextIndex;
+      _count = 0;
+    });
+    
+    _saveData();
+    
+    // عرض رسالة الانتقال
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'الانتقال إلى: \${_allAzkar[_selectedIndex]["text"]}',
+          style: GoogleFonts.amiri(fontSize: 16),
+        ),
+        backgroundColor: const Color(0xFF1565A8),
+        duration: const Duration(seconds: 2),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
+  void _resetCount() {
+    setState(() {
+      _count = 0;
+    });
+    _saveData();
   }
 
   void _selectZikr(int index) {
