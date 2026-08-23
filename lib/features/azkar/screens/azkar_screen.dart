@@ -13,28 +13,19 @@ class AzkarScreen extends StatefulWidget {
 
 class _AzkarScreenState extends State<AzkarScreen> {
   int _selectedIndex = 0;
-  Map<String, Map<int, int>> _savedCounts = {};
 
-  @override
-  void initState() {
-    super.initState();
-    _loadSavedCounts();
-  }
-
-  Future<void> _loadSavedCounts() async {
-    final prefs = await SharedPreferences.getInstance();
-    final savedData = prefs.getString('azkar_counts');
-    if (savedData != null) {
-      // تحميل البيانات المحفوظة
-      setState(() {
-        // تحويل البيانات المحفوظة إلى _savedCounts
-      });
-    }
-  }
-
-  Future<void> _saveCounts() async {
-    final prefs = await SharedPreferences.getInstance();
-    // حفظ البيانات
+  void _handleAllCompleted(int totalCount) {
+    // يمكن إضافة منطق إضافي هنا عند إكمال جميع الأذكار
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'تم إكمال جميع الأذكار! بارك الله فيك',
+          style: GoogleFonts.amiri(fontSize: 16),
+        ),
+        backgroundColor: Colors.green,
+        duration: const Duration(seconds: 3),
+      ),
+    );
   }
 
   @override
@@ -85,6 +76,7 @@ class _AzkarScreenState extends State<AzkarScreen> {
           Expanded(
             child: AzkarListWidget(
               category: AzkarData.categories[_selectedIndex],
+              onAllCompleted: _handleAllCompleted,
             ),
           ),
         ],
