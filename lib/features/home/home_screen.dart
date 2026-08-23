@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:adhan/adhan.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/providers/settings_provider.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -23,12 +24,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   String _hijriDate = '';
   Position? _currentPosition;
   Map<String, DateTime>? _prayerTimes;
+  bool _isManualLocation = false;
+  String _savedCity = '';
+  String _savedCountry = '';
 
   @override
   void initState() {
     super.initState();
     _updateHijriDate();
-    _initializePrayerTimes();
+    _loadSavedLocation();
     _startCountdown();
   }
 
@@ -37,7 +41,52 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     _hijriDate = DateFormat('dd MMMM yyyy', 'ar').format(now);
   }
 
+  Future<void> _loadSavedLocation() async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedLat = prefs.getDouble('latitude');
+    final savedLon = prefs.getDouble('longitude');
+    final savedCity = prefs.getString('city');
+    final savedCountry = prefs.getString('country');
+    final isManual = prefs.getBool('isManualLocation') ?? false;
+
+    if (savedLat != null && savedLon != null) {
+      setState(() {
+        _currentPosition = Position(
+          latitude: savedLat,
+          longitude: savedLon,
+          timestamp: DateTime.now(),
+          accuracy: 0.0,
+          altitude: 0.0,
+          altitudeAccuracy: 0.0,
+          heading: 0.0,
+          headingAccuracy: 0.0,
+          speed: 0.0,
+          speedAccuracy: 0.0,
+        );
+        _isManualLocation = isManual;
+        _savedCity = savedCity ?? '';
+        _savedCountry = savedCountry ?? '';
+      });
+      await _calculatePrayerTimes();
+    } else {
+      await _initializePrayerTimes();
+    }
+  }
+
+  Future<void> _saveLocation() async {
+    if (_currentPosition == null) return;
+    
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setDouble('latitude', _currentPosition!.latitude);
+    await prefs.setDouble('longitude', _currentPosition!.longitude);
+    await prefs.setString('city', _savedCity);
+    await prefs.setString('country', _savedCountry);
+    await prefs.setBool('isManualLocation', _isManualLocation);
+  }
+
   Future<void> _initializePrayerTimes() async {
+    setState(() => _isManualLocation = false);
+
     try {
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (serviceEnabled) {
@@ -53,28 +102,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
           setState(() {
             _currentPosition = position;
+            _savedCity = '';
+            _savedCountry = '';
           });
 
+          await _saveLocation();
           await _calculatePrayerTimes();
         }
       }
     } catch (e) {
-      // Use default location (Makkah)
-      setState(() {
-        _currentPosition = Position(
-          latitude: 21.3891,
-          longitude: 39.8579,
-          timestamp: DateTime.now(),
-          accuracy: 0.0,
-          altitude: 0.0,
-          altitudeAccuracy: 0.0,
-          heading: 0.0,
-          headingAccuracy: 0.0,
-          speed: 0.0,
-          speedAccuracy: 0.0,
-        );
-      });
-      await _calculatePrayerTimes();
+      await _useDefaultLocation();
     }
   }
 
@@ -102,18 +139,30 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         _updateNextPrayer();
       });
     } catch (e) {
-      // Default times
-      setState(() {
-        _prayerTimes = {
-          'Fajr': DateTime.now().copyWith(hour: 5, minute: 0),
-          'Dhuhr': DateTime.now().copyWith(hour: 12, minute: 30),
-          'Asr': DateTime.now().copyWith(hour: 15, minute: 45),
-          'Maghrib': DateTime.now().copyWith(hour: 18, minute: 15),
-          'Isha': DateTime.now().copyWith(hour: 19, minute: 45),
-        };
-        _updateNextPrayer();
-      });
+      await _useDefaultLocation();
     }
+  }
+
+  Future<void> _useDefaultLocation() async {
+    setState(() {
+      _currentPosition = Position(
+        latitude: 21.3891,
+        longitude: 39.8579,
+        timestamp: DateTime.now(),
+        accuracy: 0.0,
+        altitude: 0.0,
+        altitudeAccuracy: 0.0,
+        heading: 0.0,
+        headingAccuracy: 0.0,
+        speed: 0.0,
+        speedAccuracy: 0.0,
+      );
+      _isManualLocation = false;
+      _savedCity = 'مكة المكرمة';
+      _savedCountry = 'السعودية';
+    });
+    await _saveLocation();
+    await _calculatePrayerTimes();
   }
 
   void _updateNextPrayer() {
@@ -187,6 +236,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ),
         centerTitle: true,
         actions: [
+          if (_isManualLocation)
+            IconButton(
+              icon: const Icon(Icons.location_off, color: Colors.amber),
+              tooltip: 'موقع يدوي: $_savedCity',
+              onPressed: null,
+            ),
           IconButton(
             icon: Icon(
               isDark ? Icons.light_mode : Icons.dark_mode,
@@ -550,8 +605,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   void _showSettings(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    
     showModalBottomSheet(
       context: context,
       builder: (context) => Container(
@@ -568,19 +621,32 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
             ),
             const SizedBox(height: 24),
+            ListTile(
+              leading: const Icon(Icons.my_location, color: Color(0xFF1565A8)),
+              title: Text('تحديث الموقع', style: GoogleFonts.amiri(fontSize: 16)),
+              subtitle: Text('الحصول على الموقع الحالي', style: GoogleFonts.amiri(fontSize: 12)),
+              onTap: () {
+                Navigator.pop(context);
+                setState(() => _isManualLocation = false);
+                _initializePrayerTimes();
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.location_city, color: Color(0xFF1565A8)),
+              title: Text('اختيار مدينة', style: GoogleFonts.amiri(fontSize: 16)),
+              subtitle: Text('تحديد مدينة يدوياً', style: GoogleFonts.amiri(fontSize: 12)),
+              onTap: () {
+                Navigator.pop(context);
+                context.push('/prayer');
+              },
+            ),
+            const Divider(),
             SwitchListTile(
-              title: Text(
-                'الوضع الليلي',
-                style: GoogleFonts.amiri(fontSize: 16),
-              ),
-              subtitle: Text(
-                'تفعيل الوضع الداكن',
-                style: GoogleFonts.amiri(fontSize: 14),
-              ),
-              value: isDark,
+              title: Text('الوضع الليلي', style: GoogleFonts.amiri(fontSize: 16)),
+              subtitle: Text('تفعيل الوضع الداكن', style: GoogleFonts.amiri(fontSize: 12)),
+              value: Theme.of(context).brightness == Brightness.dark,
               onChanged: (value) {
                 ref.read(themeModeProvider.notifier).toggleTheme();
-                Navigator.pop(context);
               },
             ),
           ],
