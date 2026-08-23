@@ -183,7 +183,7 @@ class _TasbihScreenState extends State<TasbihScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          'الانتقال إلى: \${currentZikr["text"]}',
+          'الانتقال إلى: ${_allAzkar[_selectedIndex]['text']}',
           style: GoogleFonts.amiri(fontSize: 16),
         ),
         backgroundColor: const Color(0xFF1565A8),
