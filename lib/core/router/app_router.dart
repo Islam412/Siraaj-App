@@ -4,7 +4,7 @@ import '../../features/home/home_screen.dart';
 import '../../features/quran/quran_screen.dart';
 import '../../features/hadith/hadith_screen.dart';
 import '../../features/azkar/azkar_screen.dart';
-import '../../features/tasbih/tasbih_screen.dart';
+import '../../features/tasbih/screens/tasbih_screen.dart';
 import '../../features/prayer/screens/prayer_screen.dart';
 import '../../features/qibla/screens/qibla_screen.dart';
 import '../../features/muhasaba/muhasaba_screen.dart';
