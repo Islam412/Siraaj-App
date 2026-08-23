@@ -97,7 +97,7 @@ class _QiblaScreenState extends State<QiblaScreen> {
         _qiblaDirection = 45.0;
         _distanceToKaaba = 0.0;
         _isLoading = false;
-        _errorMessage = 'حدث خطأ: \$e';
+        _errorMessage = 'حدث خطأ: $e';
       });
     }
   }
@@ -127,14 +127,27 @@ class _QiblaScreenState extends State<QiblaScreen> {
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) {
+  String _getDisplayAngle() {
     final angleDifference = _hasCompass 
         ? (_qiblaDirection - _deviceDirection) % 360
         : 0.0;
     final normalizedAngle = angleDifference < 0 ? angleDifference + 360 : angleDifference;
     final displayAngle = normalizedAngle > 180 ? normalizedAngle - 360 : normalizedAngle;
-    final isAligned = normalizedAngle < 5 || normalizedAngle > 355;
+    return displayAngle.toStringAsFixed(0);
+  }
+
+  bool _getIsAligned() {
+    final angleDifference = _hasCompass 
+        ? (_qiblaDirection - _deviceDirection) % 360
+        : 0.0;
+    final normalizedAngle = angleDifference < 0 ? angleDifference + 360 : angleDifference;
+    return normalizedAngle < 5 || normalizedAngle > 355;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final displayAngle = _getDisplayAngle();
+    final isAligned = _getIsAligned();
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
@@ -180,7 +193,6 @@ class _QiblaScreenState extends State<QiblaScreen> {
                   ),
                   const SizedBox(height: 25),
 
-                  // عرض درجة الانحراف
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
                     decoration: BoxDecoration(
@@ -208,7 +220,7 @@ class _QiblaScreenState extends State<QiblaScreen> {
                         ),
                         const SizedBox(height: 10),
                         Text(
-                          '${displayAngle.toStringAsFixed(0)}°',
+                          '$displayAngle°',
                           style: const TextStyle(
                             fontSize: 48,
                             fontWeight: FontWeight.bold,
@@ -227,11 +239,9 @@ class _QiblaScreenState extends State<QiblaScreen> {
                   ),
                   const SizedBox(height: 30),
 
-                  // البوصلة مع الكعبة
                   _buildCompass(isAligned),
                   const SizedBox(height: 25),
 
-                  // معلومات المسافة والموقع
                   Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
@@ -250,21 +260,21 @@ class _QiblaScreenState extends State<QiblaScreen> {
                       children: [
                         Column(
                           children: [
-                            Icon(Icons.place, color: const Color(0xFF1976D2), size: 30),
+                            const Icon(Icons.place, color: Color(0xFF1976D2), size: 30),
                             const SizedBox(height: 8),
-                            Text(
+                            const Text(
                               'المسافة',
-                              style: TextStyle(fontSize: 14, color: const Color(0xFF757575)),
+                              style: TextStyle(fontSize: 14, color: Color(0xFF757575)),
                             ),
                             const SizedBox(height: 5),
                             Text(
                               _distanceToKaaba > 0
                                   ? '${_distanceToKaaba.toStringAsFixed(1)} كم'
                                   : '0.0 كم',
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
-                                color: const Color(0xFF1976D2),
+                                color: Color(0xFF1976D2),
                               ),
                             ),
                           ],
@@ -276,21 +286,21 @@ class _QiblaScreenState extends State<QiblaScreen> {
                         ),
                         Column(
                           children: [
-                            Icon(Icons.my_location, color: const Color(0xFF388E3C), size: 30),
+                            const Icon(Icons.my_location, color: Color(0xFF388E3C), size: 30),
                             const SizedBox(height: 8),
                             const Text(
                               'موقعك',
-                              style: TextStyle(fontSize: 14, color: const Color(0xFF757575)),
+                              style: TextStyle(fontSize: 14, color: Color(0xFF757575)),
                             ),
                             const SizedBox(height: 5),
                             Text(
                               _currentPosition != null
                                   ? '${_currentPosition!.latitude.toStringAsFixed(2)}, ${_currentPosition!.longitude.toStringAsFixed(2)}'
                                   : 'غير متوفر',
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
-                                color: const Color(0xFF388E3C),
+                                color: Color(0xFF388E3C),
                               ),
                               textAlign: TextAlign.center,
                             ),
@@ -334,7 +344,7 @@ class _QiblaScreenState extends State<QiblaScreen> {
       height: 320,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: const Color(0xFF757575),
+        color: Colors.grey[600],
         border: Border.all(color: Colors.grey[700]!, width: 8),
         boxShadow: [
           BoxShadow(
@@ -352,7 +362,6 @@ class _QiblaScreenState extends State<QiblaScreen> {
             painter: CompassPainter(deviceDirection: _deviceDirection),
           ),
           
-          // حساب موقع الكعبة هندسياً
           Builder(
             builder: (context) {
               final qiblaAngleRad = _qiblaDirection * math.pi / 180;
@@ -361,20 +370,37 @@ class _QiblaScreenState extends State<QiblaScreen> {
               final qiblaY = 160.0 - qiblaRadius * math.cos(qiblaAngleRad);
               
               return Positioned(
-                left: qiblaX - 30,
+                left: qiblaX - 20,
                 top: qiblaY - 50,
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
-                  children: const [
-                    // رسم الكعبة
-                    KaabaWidget(size: 40),
-                    SizedBox(height: 4),
-                    Text(
-                      'القبلة',
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
+                  children: [
+                    // علامة الموقع الحمراء الاحترافية
+                    CustomPaint(
+                      size: const Size(40, 50),
+                      painter: LocationPinPainter(),
+                    ),
+                    const SizedBox(height: 4),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(4),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.2),
+                            blurRadius: 3,
+                            offset: const Offset(0, 1),
+                          ),
+                        ],
+                      ),
+                      child: const Text(
+                        'القبلة',
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                        ),
                       ),
                     ),
                   ],
@@ -383,7 +409,6 @@ class _QiblaScreenState extends State<QiblaScreen> {
             },
           ),
 
-          // الإبرة المتحركة مع الجهاز
           Transform.rotate(
             angle: _deviceDirection * math.pi / 180,
             child: const CustomPaint(
@@ -406,79 +431,82 @@ class _QiblaScreenState extends State<QiblaScreen> {
   }
 }
 
-// رسم الكعبة بشكل احترافي
-class KaabaWidget extends StatelessWidget {
-  final double size;
-  
-  const KaabaWidget({super.key, required this.size});
-
-  @override
-  Widget build(BuildContext context) {
-    return CustomPaint(
-      size: Size(size, size * 0.8),
-      painter: KaabaPainter(),
-    );
-  }
-}
-
-class KaabaPainter extends CustomPainter {
+// رسم علامة الموقع الحمراء الاحترافية
+class LocationPinPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = const Color(0xFF0A0A0A)
-      ..style = PaintingStyle.fill;
+    final center = Offset(size.width / 2, size.height * 0.4);
+    final radius = size.width * 0.35;
 
-    // جسم الكعبة (مكعب)
-    final kaabaRect = RRect.fromRectAndRadius(
-      Rect.fromLTWH(0, size.height * 0.2, size.width, size.height * 0.8),
-      const Radius.circular(2),
-    );
-    canvas.drawRRect(kaabaRect, paint);
-
-    // الكسوة السوداء العلوية
-    canvas.drawRect(
-      Rect.fromLTWH(0, size.height * 0.2, size.width, size.height * 0.15),
-      Paint()..color = const Color(0xFF1A1A1A),
-    );
-
-    // كتابة "الله" على الكسوة
-    final textPainter = TextPainter(
-      text: const TextSpan(
-        text: 'الله',
-        style: TextStyle(
-          color: Color(0xFFB8922A),
-          fontSize: 8,
-          fontWeight: FontWeight.bold,
-        ),
+    // الظل السفلي
+    canvas.drawOval(
+      Rect.fromCenter(
+        center: Offset(size.width / 2, size.height * 0.92),
+        width: size.width * 0.5,
+        height: 6,
       ),
-      textDirection: TextDirection.rtl,
-    );
-    textPainter.layout();
-    textPainter.paint(
-      canvas,
-      Offset(
-        (size.width - textPainter.width) / 2,
-        size.height * 0.25,
-      ),
+      Paint()..color = Colors.black.withOpacity(0.3),
     );
 
-    // الحجر الأسود (دائرة صغيرة)
+    // جسم العلامة (الشكل الدمعي)
+    final pinPath = Path();
+    pinPath.moveTo(size.width / 2, size.height * 0.95);
+    pinPath.quadraticBezierTo(
+      size.width * 0.15, size.height * 0.6,
+      size.width * 0.15, size.height * 0.35,
+    );
+    pinPath.arcToPoint(
+      Offset(size.width * 0.85, size.height * 0.35),
+      radius: Radius.circular(radius),
+      clockwise: true,
+    );
+    pinPath.quadraticBezierTo(
+      size.width * 0.85, size.height * 0.6,
+      size.width / 2, size.height * 0.95,
+    );
+    pinPath.close();
+
+    // تدرج لوني للعلامة
+    final pinPaint = Paint()
+      ..shader = RadialGradient(
+        center: const Alignment(0.3, 0.3),
+        colors: [const Color(0xFFFF4444), const Color(0xFFCC0000)],
+      ).createShader(Rect.fromLTWH(0, 0, size.width, size.height * 0.95));
+
+    canvas.drawPath(pinPath, pinPaint);
+
+    // حدود خفيفة
+    canvas.drawPath(
+      pinPath,
+      Paint()
+        ..color = const Color(0xFF990000)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1,
+    );
+
+    // الدائرة البيضاء في المنتصف
     canvas.drawCircle(
-      Offset(size.width * 0.85, size.height * 0.5),
-      3,
-      Paint()..color = const Color(0xFF2A2A2A),
+      center,
+      radius * 0.45,
+      Paint()..color = Colors.white,
     );
 
-    // الميزاب (خط ذهبي)
-    canvas.drawRect(
-      Rect.fromLTWH(size.width * 0.3, size.height * 0.18, size.width * 0.4, 3),
-      Paint()..color = const Color(0xFFB8922A),
+    // ظل داخلي للدائرة البيضاء
+    canvas.drawCircle(
+      Offset(center.dx - 2, center.dy - 2),
+      radius * 0.4,
+      Paint()..color = Colors.white.withOpacity(0.5),
     );
 
-    // حدود ذهبية
-    canvas.drawRect(
-      Rect.fromLTWH(0, size.height * 0.2, size.width, 2),
-      Paint()..color = const Color(0xFFB8922A),
+    // لمعة على العلامة
+    final highlightPaint = Paint()
+      ..color = Colors.white.withOpacity(0.4)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3);
+    
+    canvas.drawCircle(
+      Offset(size.width * 0.35, size.height * 0.25),
+      radius * 0.2,
+      highlightPaint,
     );
   }
 
@@ -569,7 +597,6 @@ class CompassNeedlePainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
     
-    // الإبرة الحمراء (الشمال)
     final redPath = Path();
     redPath.moveTo(center.dx, center.dy - size.height / 2 + 10);
     redPath.lineTo(center.dx - 15, center.dy);
@@ -584,7 +611,6 @@ class CompassNeedlePainter extends CustomPainter {
         ..style = PaintingStyle.fill,
     );
 
-    // الإبرة البيضاء (الجنوب)
     final whitePath = Path();
     whitePath.moveTo(center.dx, center.dy + size.height / 2 - 10);
     whitePath.lineTo(center.dx - 15, center.dy);
