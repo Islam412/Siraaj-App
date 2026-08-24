@@ -11,35 +11,79 @@ class HadithScreen extends StatefulWidget {
 
 class _HadithScreenState extends State<HadithScreen> {
   int _selectedIndex = 0;
+  bool _isDarkMode = true;
+
+  // ألوان الوضع الداكن
+  final Color _darkBg = const Color(0xFF0B1623);
+  final Color _darkSidebar = const Color(0xFF132033);
+  final Color _darkAppBar = const Color(0xFF1E3A5F);
+  final Color _darkCard = Colors.white.withOpacity(0.05);
+  final Color _darkText = Colors.white;
+  final Color _darkTextSecondary = Colors.white70;
+
+  // ألوان الوضع الفاتح
+  final Color _lightBg = const Color(0xFFF5F6F8);
+  final Color _lightSidebar = const Color(0xFFE8EAF6);
+  final Color _lightAppBar = const Color(0xFF1565A8);
+  final Color _lightCard = Colors.white;
+  final Color _lightText = const Color(0xFF1A1A1A);
+  final Color _lightTextSecondary = const Color(0xFF666666);
+
+  Color get _bgColor => _isDarkMode ? _darkBg : _lightBg;
+  Color get _sidebarColor => _isDarkMode ? _darkSidebar : _lightSidebar;
+  Color get _appBarColor => _isDarkMode ? _darkAppBar : _lightAppBar;
+  Color get _cardColor => _isDarkMode ? _darkCard : _lightCard;
+  Color get _textColor => _isDarkMode ? _darkText : _lightText;
+  Color get _textSecondaryColor => _isDarkMode ? _darkTextSecondary : _lightTextSecondary;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0B1623),
+      backgroundColor: _bgColor,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1E3A5F),
+        backgroundColor: _appBarColor,
         foregroundColor: Colors.white,
         elevation: 0,
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.menu_book, color: Color(0xFFB8922A)),
+            Icon(
+              _isDarkMode ? Icons.dark_mode : Icons.light_mode,
+              color: const Color(0xFFB8922A),
+            ),
             const SizedBox(width: 10),
-            Text('الأحاديث النبوية', style: GoogleFonts.amiri(fontSize: 24, fontWeight: FontWeight.bold)),
+            Text(
+              'الأحاديث النبوية',
+              style: GoogleFonts.amiri(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
           ],
         ),
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: Icon(
+              _isDarkMode ? Icons.light_mode : Icons.dark_mode,
+              color: const Color(0xFFB8922A),
+            ),
+            tooltip: _isDarkMode ? 'الوضع الفاتح' : 'الوضع الداكن',
+            onPressed: () {
+              setState(() {
+                _isDarkMode = !_isDarkMode;
+              });
+            },
+          ),
+        ],
       ),
       body: Row(
         children: [
-          // القائمة الجانبية المحسنة
+          // القائمة الجانبية
           Container(
             width: 280,
             decoration: BoxDecoration(
-              color: const Color(0xFF132033),
+              color: _sidebarColor,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.3),
+                  color: Colors.black.withOpacity(_isDarkMode ? 0.3 : 0.1),
                   blurRadius: 10,
                   offset: const Offset(2, 0),
                 ),
@@ -51,8 +95,11 @@ class _HadithScreenState extends State<HadithScreen> {
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFF1565A8), Color(0xFF1E3A5F)],
+                    gradient: LinearGradient(
+                      colors: [
+                        _appBarColor,
+                        _appBarColor.withOpacity(0.7),
+                      ],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
@@ -63,7 +110,11 @@ class _HadithScreenState extends State<HadithScreen> {
                   ),
                   child: Column(
                     children: [
-                      Icon(Icons.library_books, size: 50, color: Colors.white.withOpacity(0.9)),
+                      Icon(
+                        Icons.library_books,
+                        size: 50,
+                        color: Colors.white.withOpacity(0.9),
+                      ),
                       const SizedBox(height: 10),
                       Text(
                         'مكتبة الأحاديث',
@@ -76,7 +127,7 @@ class _HadithScreenState extends State<HadithScreen> {
                     ],
                   ),
                 ),
-                
+
                 // القائمة
                 Expanded(
                   child: ListView.builder(
@@ -85,12 +136,12 @@ class _HadithScreenState extends State<HadithScreen> {
                     itemBuilder: (context, index) {
                       final category = HadithData.categories[index];
                       final isSelected = index == _selectedIndex;
-                      
+
                       return Container(
                         margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                         decoration: BoxDecoration(
-                          color: isSelected 
-                              ? Color(int.parse(category.color)).withOpacity(0.3)
+                          color: isSelected
+                              ? Color(int.parse(category.color)).withOpacity(_isDarkMode ? 0.3 : 0.2)
                               : Colors.transparent,
                           borderRadius: BorderRadius.circular(12),
                           border: isSelected
@@ -120,14 +171,14 @@ class _HadithScreenState extends State<HadithScreen> {
                             style: GoogleFonts.amiri(
                               fontSize: 16,
                               fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                              color: isSelected ? Colors.white : Colors.white70,
+                              color: isSelected ? _textColor : _textSecondaryColor,
                             ),
                           ),
                           subtitle: Text(
                             '${category.hadiths.length} حديث',
                             style: GoogleFonts.amiri(
                               fontSize: 12,
-                              color: isSelected ? Colors.white70 : Colors.white54,
+                              color: isSelected ? _textSecondaryColor : _textSecondaryColor.withOpacity(0.7),
                             ),
                           ),
                           trailing: isSelected
@@ -143,12 +194,12 @@ class _HadithScreenState extends State<HadithScreen> {
                     },
                   ),
                 ),
-                
+
                 // Footer
                 Container(
                   padding: const EdgeInsets.all(15),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.05),
+                    color: _isDarkMode ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.05),
                     borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(20),
                       topRight: Radius.circular(20),
@@ -156,14 +207,14 @@ class _HadithScreenState extends State<HadithScreen> {
                   ),
                   child: Row(
                     children: [
-                      Icon(Icons.info_outline, color: Colors.white54, size: 20),
+                      Icon(Icons.info_outline, color: _textSecondaryColor, size: 20),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
                           'جميع الأحاديث صحيحة',
                           style: GoogleFonts.amiri(
                             fontSize: 12,
-                            color: Colors.white54,
+                            color: _textSecondaryColor,
                           ),
                         ),
                       ),
@@ -173,7 +224,7 @@ class _HadithScreenState extends State<HadithScreen> {
               ],
             ),
           ),
-          
+
           // محتوى الأحاديث
           Expanded(
             child: _buildHadithList(),
@@ -185,25 +236,18 @@ class _HadithScreenState extends State<HadithScreen> {
 
   Widget _buildHadithList() {
     final category = HadithData.categories[_selectedIndex];
-    
+
     return ListView.builder(
       padding: const EdgeInsets.all(20),
       itemCount: category.hadiths.length,
       itemBuilder: (context, index) {
         final hadith = category.hadiths[index];
         final sourceColor = _getSourceColor(hadith['source'] as String);
-        
+
         return Container(
           margin: const EdgeInsets.only(bottom: 20),
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topRight,
-              end: Alignment.bottomLeft,
-              colors: [
-                Colors.white.withOpacity(0.08),
-                Colors.white.withOpacity(0.03),
-              ],
-            ),
+            color: _cardColor,
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
               color: Color(int.parse(category.color)).withOpacity(0.3),
@@ -211,7 +255,7 @@ class _HadithScreenState extends State<HadithScreen> {
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.2),
+                color: Colors.black.withOpacity(_isDarkMode ? 0.2 : 0.1),
                 blurRadius: 10,
                 offset: const Offset(0, 5),
               ),
@@ -245,7 +289,7 @@ class _HadithScreenState extends State<HadithScreen> {
                       ),
                       child: Row(
                         children: [
-                          Icon(Icons.bookmark, size: 16, color: Colors.white),
+                          const Icon(Icons.bookmark, size: 16, color: Colors.white),
                           const SizedBox(width: 6),
                           Text(
                             'حديث ${hadith['number']}',
@@ -262,7 +306,7 @@ class _HadithScreenState extends State<HadithScreen> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
-                        color: sourceColor.withOpacity(0.2),
+                        color: sourceColor.withOpacity(_isDarkMode ? 0.2 : 0.15),
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(color: sourceColor),
                       ),
@@ -278,20 +322,22 @@ class _HadithScreenState extends State<HadithScreen> {
                   ],
                 ),
                 const SizedBox(height: 20),
-                
+
                 // نص الحديث
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.05),
+                    color: _isDarkMode ? Colors.white.withOpacity(0.05) : const Color(0xFFF5F5F5),
                     borderRadius: BorderRadius.circular(15),
-                    border: Border.all(color: Colors.white.withOpacity(0.1)),
+                    border: Border.all(
+                      color: _isDarkMode ? Colors.white.withOpacity(0.1) : Colors.grey.withOpacity(0.3),
+                    ),
                   ),
                   child: Text(
                     hadith['text'] as String,
                     style: GoogleFonts.amiri(
                       fontSize: 22,
-                      color: Colors.white,
+                      color: _textColor,
                       height: 2.5,
                       fontWeight: FontWeight.w500,
                     ),
@@ -299,15 +345,15 @@ class _HadithScreenState extends State<HadithScreen> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                
+
                 // الراوي
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
-                        Color(int.parse(category.color)).withOpacity(0.3),
-                        Color(int.parse(category.color)).withOpacity(0.1),
+                        Color(int.parse(category.color)).withOpacity(_isDarkMode ? 0.3 : 0.15),
+                        Color(int.parse(category.color)).withOpacity(_isDarkMode ? 0.1 : 0.05),
                       ],
                     ),
                     borderRadius: BorderRadius.circular(12),
@@ -321,7 +367,11 @@ class _HadithScreenState extends State<HadithScreen> {
                           color: Color(int.parse(category.color)).withOpacity(0.2),
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: Icon(Icons.person_outline, color: Color(int.parse(category.color)), size: 20),
+                        child: Icon(
+                          Icons.person_outline,
+                          color: Color(int.parse(category.color)),
+                          size: 20,
+                        ),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
@@ -341,7 +391,7 @@ class _HadithScreenState extends State<HadithScreen> {
                               hadith['narrator'] as String,
                               style: GoogleFonts.amiri(
                                 fontSize: 14,
-                                color: Colors.white,
+                                color: _textColor,
                               ),
                             ),
                           ],
