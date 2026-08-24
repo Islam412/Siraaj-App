@@ -11,7 +11,7 @@ import '../../features/muhasaba/muhasaba_screen.dart';
 import '../../features/podcast/podcast_screen.dart';
 import '../../features/lectures/lectures_screen.dart';
 import '../../features/books/books_screen.dart';
-import '../../features/radio/radio_screen.dart';
+import '../../features/radio/screens/radio_screen.dart';
 import '../../features/contact/contact_screen.dart';
 
 class AppRouter {
