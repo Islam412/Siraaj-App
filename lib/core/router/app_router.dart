@@ -8,7 +8,7 @@ import '../../features/tasbih/screens/tasbih_screen.dart';
 import '../../features/prayer/screens/prayer_screen.dart';
 import '../../features/qibla/screens/qibla_screen.dart';
 import '../../features/muhasaba/muhasaba_screen.dart';
-import '../../features/podcast/podcast_screen.dart';
+import '../../features/podcast/screens/podcast_screen.dart';
 import '../../features/lectures/lectures_screen.dart';
 import '../../features/books/books_screen.dart';
 import '../../features/radio/screens/radio_screen.dart';
