@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../features/home/home_screen.dart';
 import '../../features/quran/quran_screen.dart';
-import '../../features/hadith/hadith_screen.dart';
+import '../../features/hadith/screens/hadith_screen.dart';
 import '../../features/azkar/screens/azkar_screen.dart';
 import '../../features/tasbih/screens/tasbih_screen.dart';
 import '../../features/prayer/screens/prayer_screen.dart';
