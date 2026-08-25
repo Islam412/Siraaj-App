@@ -13,7 +13,7 @@ import '../../features/azkar/screens/azkar_screen.dart';
 import '../../features/tasbih/screens/tasbih_screen.dart';
 import '../../features/prayer/screens/prayer_screen.dart';
 import '../../features/qibla/screens/qibla_screen.dart';
-import '../../features/muhasaba/muhasaba_screen.dart';
+import '../../features/muhasaba/screens/muhasaba_screen.dart'; // هذا هو السطر الصحيح الوحيد
 import '../../features/podcast/screens/podcast_screen.dart';
 import '../../features/lectures/screens/lecture_screen.dart';
 import '../../features/books/screens/book_screen.dart';
@@ -30,7 +30,7 @@ class AppRouter {
         builder: (context, state) => const HomeScreen(),
       ),
       GoRoute(
-        path: '/duas',  // تم التغيير من /dua إلى /duas
+        path: '/duas',
         name: 'dua',
         builder: (context, state) => const DuaScreen(),
       ),
