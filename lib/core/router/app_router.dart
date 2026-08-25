@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../features/zakat/screens/zakat_screen.dart';
 import '../../features/asma_allah/screens/asma_allah_screen.dart';
 import '../../features/home/home_screen.dart';
 import '../../features/quran/quran_screen.dart';
@@ -19,6 +20,11 @@ class AppRouter {
   static final GoRouter router = GoRouter(
     initialLocation: '/',
     routes: [
+      GoRoute(
+        path: '/zakat',
+        name: 'zakat',
+        builder: (context, state) => const ZakatScreen(),
+      ),
       GoRoute(
         path: '/asma-allah',
         name: 'asmaAllah',
