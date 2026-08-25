@@ -1,0 +1,610 @@
+enum StoryCategory { 
+  prophets, 
+  companions, 
+  heroes, 
+  battles, 
+  conquests, 
+  states, 
+  children, 
+  general 
+}
+
+enum StoryType { text, video, both }
+
+class Story {
+  final String id;
+  final String title;
+  final String description;
+  final String thumbnailUrl;
+  final String? textContent;
+  final String? videoUrl;
+  final StoryCategory category;
+  final StoryType type;
+  final String duration;
+  final List<String> tags;
+  final String? heroName; // اسم البطل أو الصحابي
+
+  const Story({
+    required this.id,
+    required this.title,
+    required this.description,
+    required this.thumbnailUrl,
+    this.textContent,
+    this.videoUrl,
+    required this.category,
+    required this.type,
+    required this.duration,
+    required this.tags,
+    this.heroName,
+  });
+}
+
+class StoriesData {
+  static final List<Story> stories = [
+    // ==========================================
+    // === قصص الأنبياء ===
+    // ==========================================
+    Story(
+      id: '1',
+      title: 'قصة آدم عليه السلام',
+      description: 'قصة خلق آدم عليه السلام وأبو البشرية، وكيف خلقه الله بيده ونفخ فيه من روحه',
+      thumbnailUrl: 'https://i.ytimg.com/vi/example1/maxresdefault.jpg',
+      textContent: 'text_adam',
+      videoUrl: 'https://www.youtube.com/watch?v=VIDEO_ID',
+      category: StoryCategory.prophets,
+      type: StoryType.both,
+      duration: '15 دقيقة',
+      tags: ['أنبياء', 'بداية الخلق'],
+      heroName: 'آدم عليه السلام',
+    ),
+    Story(
+      id: '2',
+      title: 'قصة نوح عليه السلام',
+      description: 'قصة نوح عليه السلام والطوفان العظيم، وصبره مع قومه 950 عاماً',
+      thumbnailUrl: 'https://i.ytimg.com/vi/example2/maxresdefault.jpg',
+      textContent: 'text_nuh',
+      videoUrl: 'https://www.youtube.com/watch?v=VIDEO_ID',
+      category: StoryCategory.prophets,
+      type: StoryType.both,
+      duration: '20 دقيقة',
+      tags: ['أنبياء', 'صبر'],
+      heroName: 'نوح عليه السلام',
+    ),
+    Story(
+      id: '3',
+      title: 'قصة إبراهيم عليه السلام',
+      description: 'قصة خليل الله إبراهيم عليه السلام، وتحطيم الأصنام، وقصة الذبح العظيم',
+      thumbnailUrl: 'https://i.ytimg.com/vi/example3/maxresdefault.jpg',
+      textContent: 'text_ibrahim',
+      videoUrl: 'https://www.youtube.com/watch?v=VIDEO_ID',
+      category: StoryCategory.prophets,
+      type: StoryType.both,
+      duration: '25 دقيقة',
+      tags: ['أنبياء', 'توحيد'],
+      heroName: 'إبراهيم عليه السلام',
+    ),
+    Story(
+      id: '4',
+      title: 'قصة موسى عليه السلام',
+      description: 'قصة موسى عليه السلام مع فرعون، وفلق البحر، وإنقاذ بني إسرائيل',
+      thumbnailUrl: 'https://i.ytimg.com/vi/example4/maxresdefault.jpg',
+      textContent: 'text_musa',
+      videoUrl: 'https://www.youtube.com/watch?v=VIDEO_ID',
+      category: StoryCategory.prophets,
+      type: StoryType.both,
+      duration: '30 دقيقة',
+      tags: ['أنبياء', 'معجزات'],
+      heroName: 'موسى عليه السلام',
+    ),
+    Story(
+      id: '5',
+      title: 'قصة يوسف عليه السلام',
+      description: 'أحسن القصص، قصة يوسف عليه السلام مع إخوته، والبئر، والسجن، والتمكين',
+      thumbnailUrl: 'https://i.ytimg.com/vi/example5/maxresdefault.jpg',
+      textContent: 'text_yusuf',
+      videoUrl: 'https://www.youtube.com/watch?v=VIDEO_ID',
+      category: StoryCategory.prophets,
+      type: StoryType.both,
+      duration: '35 دقيقة',
+      tags: ['أنبياء', 'صبر'],
+      heroName: 'يوسف عليه السلام',
+    ),
+
+    // ==========================================
+    // === الصحابة الأبطال ===
+    // ==========================================
+    Story(
+      id: '6',
+      title: 'أبو بكر الصديق - أول الخلفاء',
+      description: 'قصة أبي بكر الصديق رضي الله عنه، أول من أسلم من الرجال، وصديق رسول الله، وأول خليفة',
+      thumbnailUrl: 'https://i.ytimg.com/vi/example6/maxresdefault.jpg',
+      textContent: 'text_abubakr',
+      videoUrl: 'https://www.youtube.com/watch?v=VIDEO_ID',
+      category: StoryCategory.companions,
+      type: StoryType.both,
+      duration: '25 دقيقة',
+      tags: ['صحابة', 'خلفاء', 'أبطال'],
+      heroName: 'أبو بكر الصديق',
+    ),
+    Story(
+      id: '7',
+      title: 'عمر بن الخطاب - الفاروق',
+      description: 'قصة عمر بن الخطاب رضي الله عنه، إسلامه، وعدله، وفتوحاته، ولقبه بالفاروق',
+      thumbnailUrl: 'https://i.ytimg.com/vi/example7/maxresdefault.jpg',
+      textContent: 'text_omar',
+      videoUrl: 'https://www.youtube.com/watch?v=VIDEO_ID',
+      category: StoryCategory.companions,
+      type: StoryType.both,
+      duration: '28 دقيقة',
+      tags: ['صحابة', 'خلفاء', 'عدل'],
+      heroName: 'عمر بن الخطاب',
+    ),
+    Story(
+      id: '8',
+      title: 'عثمان بن عفان - ذو النورين',
+      description: 'قصة عثمان بن عفان رضي الله عنه، جامع القرآن، وذو النورين، وحيائه',
+      thumbnailUrl: 'https://i.ytimg.com/vi/example8/maxresdefault.jpg',
+      textContent: 'text_othman',
+      videoUrl: 'https://www.youtube.com/watch?v=VIDEO_ID',
+      category: StoryCategory.companions,
+      type: StoryType.both,
+      duration: '22 دقيقة',
+      tags: ['صحابة', 'خلفاء', 'حياء'],
+      heroName: 'عثمان بن عفان',
+    ),
+    Story(
+      id: '9',
+      title: 'علي بن أبي طالب - أسد الله',
+      description: 'قصة علي بن أبي طالب رضي الله عنه، باب علم النبي، وأسد الله الغالب',
+      thumbnailUrl: 'https://i.ytimg.com/vi/example9/maxresdefault.jpg',
+      textContent: 'text_ali',
+      videoUrl: 'https://www.youtube.com/watch?v=VIDEO_ID',
+      category: StoryCategory.companions,
+      type: StoryType.both,
+      duration: '26 دقيقة',
+      tags: ['صحابة', 'خلفاء', 'شجاعة'],
+      heroName: 'علي بن أبي طالب',
+    ),
+    Story(
+      id: '10',
+      title: 'خالد بن الوليد - سيف الله',
+      description: 'قصة خالد بن الوليد رضي الله عنه، القائد الذي لم يُهزم في معركة، وسيف الله المسلول',
+      thumbnailUrl: 'https://i.ytimg.com/vi/example10/maxresdefault.jpg',
+      textContent: 'text_khalid',
+      videoUrl: 'https://www.youtube.com/watch?v=VIDEO_ID',
+      category: StoryCategory.companions,
+      type: StoryType.both,
+      duration: '30 دقيقة',
+      tags: ['صحابة', 'قائد', 'معارك'],
+      heroName: 'خالد بن الوليد',
+    ),
+    Story(
+      id: '11',
+      title: 'حمزة بن عبد المطلب - أسد الله',
+      description: 'قصة حمزة بن عبد المطلب رضي الله عنه، عم النبي وأخوه من الرضاعة، وأسد الله ورسوله',
+      thumbnailUrl: 'https://i.ytimg.com/vi/example11/maxresdefault.jpg',
+      textContent: 'text_hamza',
+      videoUrl: 'https://www.youtube.com/watch?v=VIDEO_ID',
+      category: StoryCategory.companions,
+      type: StoryType.both,
+      duration: '20 دقيقة',
+      tags: ['صحابة', 'شهداء', 'شجاعة'],
+      heroName: 'حمزة بن عبد المطلب',
+    ),
+    Story(
+      id: '12',
+      title: 'مصعب بن عمير - أول داعية',
+      description: 'قصة مصعب بن عمير رضي الله عنه، أول سفير في الإسلام، وشهيد أحد',
+      thumbnailUrl: 'https://i.ytimg.com/vi/example12/maxresdefault.jpg',
+      textContent: 'text_musab',
+      videoUrl: 'https://www.youtube.com/watch?v=VIDEO_ID',
+      category: StoryCategory.companions,
+      type: StoryType.both,
+      duration: '18 دقيقة',
+      tags: ['صحابة', 'دعاة', 'شهداء'],
+      heroName: 'مصعب بن عمير',
+    ),
+    Story(
+      id: '13',
+      title: 'بلال بن رباح - مؤذن رسول الله',
+      description: 'قصة بلال بن رباح رضي الله عنه، مؤذن رسول الله، وصبره على التعذيب',
+      thumbnailUrl: 'https://i.ytimg.com/vi/example13/maxresdefault.jpg',
+      textContent: 'text_bilal',
+      videoUrl: 'https://www.youtube.com/watch?v=VIDEO_ID',
+      category: StoryCategory.companions,
+      type: StoryType.both,
+      duration: '15 دقيقة',
+      tags: ['صحابة', 'صبر', 'أذان'],
+      heroName: 'بلال بن رباح',
+    ),
+
+    // ==========================================
+    // === الأبطال في الإسلام ===
+    // ==========================================
+    Story(
+      id: '14',
+      title: 'صلاح الدين الأيوبي',
+      description: 'قصة صلاح الدين الأيوبي وتحرير القدس من الصليبيين بعد 88 عاماً',
+      thumbnailUrl: 'https://i.ytimg.com/vi/example14/maxresdefault.jpg',
+      textContent: 'text_saladin',
+      videoUrl: 'https://www.youtube.com/watch?v=VIDEO_ID',
+      category: StoryCategory.heroes,
+      type: StoryType.both,
+      duration: '35 دقيقة',
+      tags: ['أبطال', 'تحرير', 'القدس'],
+      heroName: 'صلاح الدين الأيوبي',
+    ),
+    Story(
+      id: '15',
+      title: 'سيف الدين قطز',
+      description: 'قصة سيف الدين قطز ومعركة عين جالوت وهزيمة المغول',
+      thumbnailUrl: 'https://i.ytimg.com/vi/example15/maxresdefault.jpg',
+      textContent: 'text_qutuz',
+      videoUrl: 'https://www.youtube.com/watch?v=VIDEO_ID',
+      category: StoryCategory.heroes,
+      type: StoryType.both,
+      duration: '28 دقيقة',
+      tags: ['أبطال', 'معركة', 'مغول'],
+      heroName: 'سيف الدين قطز',
+    ),
+    Story(
+      id: '16',
+      title: 'الظاهر بيبرس',
+      description: 'قصة الظاهر بيبرس، سلطان مصر، وهزيمته للمغول والصليبيين',
+      thumbnailUrl: 'https://i.ytimg.com/vi/example16/maxresdefault.jpg',
+      textContent: 'text_baibars',
+      videoUrl: 'https://www.youtube.com/watch?v=VIDEO_ID',
+      category: StoryCategory.heroes,
+      type: StoryType.both,
+      duration: '30 دقيقة',
+      tags: ['أبطال', 'سلاطين', 'معركة'],
+      heroName: 'الظاهر بيبرس',
+    ),
+    Story(
+      id: '17',
+      title: 'محمد الفاتح',
+      description: 'قصة محمد الفاتح وفتح القسطنطينية، بشارة النبي صلى الله عليه وسلم',
+      thumbnailUrl: 'https://i.ytimg.com/vi/example17/maxresdefault.jpg',
+      textContent: 'text_mehmed',
+      videoUrl: 'https://www.youtube.com/watch?v=VIDEO_ID',
+      category: StoryCategory.heroes,
+      type: StoryType.both,
+      duration: '32 دقيقة',
+      tags: ['أبطال', 'فتح', 'القسطنطينية'],
+      heroName: 'محمد الفاتح',
+    ),
+    Story(
+      id: '18',
+      title: 'عبد الرحمن الداخل',
+      description: 'قصة عبد الرحمن الداخل، صقر قريش، ومؤسس الدولة الأموية في الأندلس',
+      thumbnailUrl: 'https://i.ytimg.com/vi/example18/maxresdefault.jpg',
+      textContent: 'text_abdurrahman',
+      videoUrl: 'https://www.youtube.com/watch?v=VIDEO_ID',
+      category: StoryCategory.heroes,
+      type: StoryType.both,
+      duration: '26 دقيقة',
+      tags: ['أبطال', 'الأندلس', 'أمويون'],
+      heroName: 'عبد الرحمن الداخل',
+    ),
+
+    // ==========================================
+    // === غزوات النبي صلى الله عليه وسلم ===
+    // ==========================================
+    Story(
+      id: '19',
+      title: 'غزوة بدر الكبرى',
+      description: 'قصة غزوة بدر الكبرى، أول معركة في الإسلام، والنصر المبين بـ 313 مسلم',
+      thumbnailUrl: 'https://i.ytimg.com/vi/example19/maxresdefault.jpg',
+      textContent: 'text_badr',
+      videoUrl: 'https://www.youtube.com/watch?v=VIDEO_ID',
+      category: StoryCategory.battles,
+      type: StoryType.both,
+      duration: '35 دقيقة',
+      tags: ['غزوات', 'معركة', 'نصر'],
+      heroName: 'النبي محمد ﷺ',
+    ),
+    Story(
+      id: '20',
+      title: 'غزوة أحد',
+      description: 'قصة غزوة أحد، والابتلاء للمؤمنين، وصمود النبي وأصحابه',
+      thumbnailUrl: 'https://i.ytimg.com/vi/example20/maxresdefault.jpg',
+      textContent: 'text_uhud',
+      videoUrl: 'https://www.youtube.com/watch?v=VIDEO_ID',
+      category: StoryCategory.battles,
+      type: StoryType.both,
+      duration: '30 دقيقة',
+      tags: ['غزوات', 'معركة', 'صبر'],
+      heroName: 'النبي محمد ﷺ',
+    ),
+    Story(
+      id: '21',
+      title: 'غزوة الخندق (الأحزاب)',
+      description: 'قصة غزوة الخندق، وحفر الصحابة للخندق، ونصر الله للمؤمنين',
+      thumbnailUrl: 'https://i.ytimg.com/vi/example21/maxresdefault.jpg',
+      textContent: 'text_khandaq',
+      videoUrl: 'https://www.youtube.com/watch?v=VIDEO_ID',
+      category: StoryCategory.battles,
+      type: StoryType.both,
+      duration: '28 دقيقة',
+      tags: ['غزوات', 'معركة', 'حفر'],
+      heroName: 'النبي محمد ﷺ',
+    ),
+    Story(
+      id: '22',
+      title: 'غزوة خيبر',
+      description: 'قصة غزوة خيبر، وفتح الحصون، وعلي يحمل الراية',
+      thumbnailUrl: 'https://i.ytimg.com/vi/example22/maxresdefault.jpg',
+      textContent: 'text_khaybar',
+      videoUrl: 'https://www.youtube.com/watch?v=VIDEO_ID',
+      category: StoryCategory.battles,
+      type: StoryType.both,
+      duration: '25 دقيقة',
+      tags: ['غزوات', 'معركة', 'فتح'],
+      heroName: 'النبي محمد ',
+    ),
+    Story(
+      id: '23',
+      title: 'فتح مكة',
+      description: 'قصة فتح مكة، ودخول النبي وأصحابه مكة منتصرين، والعفو العام',
+      thumbnailUrl: 'https://i.ytimg.com/vi/example23/maxresdefault.jpg',
+      textContent: 'text_makkah',
+      videoUrl: 'https://www.youtube.com/watch?v=VIDEO_ID',
+      category: StoryCategory.battles,
+      type: StoryType.both,
+      duration: '30 دقيقة',
+      tags: ['غزوات', 'فتح', 'مكة'],
+      heroName: 'النبي محمد ',
+    ),
+    Story(
+      id: '24',
+      title: 'غزوة حنين',
+      description: 'قصة غزوة حنين، والابتلاء بالوفرة، والنصر بعد الشدة',
+      thumbnailUrl: 'https://i.ytimg.com/vi/example24/maxresdefault.jpg',
+      textContent: 'text_hunayn',
+      videoUrl: 'https://www.youtube.com/watch?v=VIDEO_ID',
+      category: StoryCategory.battles,
+      type: StoryType.both,
+      duration: '22 دقيقة',
+      tags: ['غزوات', 'معركة', 'نصر'],
+      heroName: 'النبي محمد ﷺ',
+    ),
+
+    // ==========================================
+    // === الفتوحات الإسلامية ===
+    // ==========================================
+    Story(
+      id: '25',
+      title: 'فتح الشام',
+      description: 'قصة فتح بلاد الشام، ومعركة اليرموك، وانتشار الإسلام',
+      thumbnailUrl: 'https://i.ytimg.com/vi/example25/maxresdefault.jpg',
+      textContent: 'text_sham',
+      videoUrl: 'https://www.youtube.com/watch?v=VIDEO_ID',
+      category: StoryCategory.conquests,
+      type: StoryType.both,
+      duration: '32 دقيقة',
+      tags: ['فتوحات', 'الشام', 'معركة'],
+      heroName: 'خالد بن الوليد',
+    ),
+    Story(
+      id: '26',
+      title: 'فتح مصر',
+      description: 'قصة فتح مصر على يد عمرو بن العاص، وبناء الفسطاط',
+      thumbnailUrl: 'https://i.ytimg.com/vi/example26/maxresdefault.jpg',
+      textContent: 'text_egypt',
+      videoUrl: 'https://www.youtube.com/watch?v=VIDEO_ID',
+      category: StoryCategory.conquests,
+      type: StoryType.both,
+      duration: '28 دقيقة',
+      tags: ['فتوحات', 'مصر', 'عمرو بن العاص'],
+      heroName: 'عمرو بن العاص',
+    ),
+    Story(
+      id: '27',
+      title: 'فتح فارس',
+      description: 'قصة فتح بلاد فارس، وسقوط الإمبراطورية الساسانية',
+      thumbnailUrl: 'https://i.ytimg.com/vi/example27/maxresdefault.jpg',
+      textContent: 'text_persia',
+      videoUrl: 'https://www.youtube.com/watch?v=VIDEO_ID',
+      category: StoryCategory.conquests,
+      type: StoryType.both,
+      duration: '35 دقيقة',
+      tags: ['فتوحات', 'فارس', 'إمبراطورية'],
+      heroName: 'سعد بن أبي وقاص',
+    ),
+    Story(
+      id: '28',
+      title: 'فتح الأندلس',
+      description: 'قصة فتح الأندلس على يد طارق بن زياد، وحرق السفن',
+      thumbnailUrl: 'https://i.ytimg.com/vi/example28/maxresdefault.jpg',
+      textContent: 'text_andalusia',
+      videoUrl: 'https://www.youtube.com/watch?v=VIDEO_ID',
+      category: StoryCategory.conquests,
+      type: StoryType.both,
+      duration: '30 دقيقة',
+      tags: ['فتوحات', 'الأندلس', 'طارق بن زياد'],
+      heroName: 'طارق بن زياد',
+    ),
+    Story(
+      id: '29',
+      title: 'فتح القسطنطينية',
+      description: 'قصة فتح القسطنطينية، حلم المسلمين لقرون، ومحمد الفاتح',
+      thumbnailUrl: 'https://i.ytimg.com/vi/example29/maxresdefault.jpg',
+      textContent: 'text_constantinople',
+      videoUrl: 'https://www.youtube.com/watch?v=VIDEO_ID',
+      category: StoryCategory.conquests,
+      type: StoryType.both,
+      duration: '38 دقيقة',
+      tags: ['فتوحات', 'القسطنطينية', 'بشارة'],
+      heroName: 'محمد الفاتح',
+    ),
+
+    // ==========================================
+    // === الدول الإسلامية ===
+    // ==========================================
+    Story(
+      id: '30',
+      title: 'الدولة الراشدة',
+      description: 'قصة الدولة الراشدة، والخلفاء الراشدين الأربعة، وعصر الفتوحات',
+      thumbnailUrl: 'https://i.ytimg.com/vi/example30/maxresdefault.jpg',
+      textContent: 'text_rashidun',
+      videoUrl: 'https://www.youtube.com/watch?v=VIDEO_ID',
+      category: StoryCategory.states,
+      type: StoryType.both,
+      duration: '40 دقيقة',
+      tags: ['دول', 'خلفاء', 'راشدة'],
+      heroName: 'الخلفاء الراشدون',
+    ),
+    Story(
+      id: '31',
+      title: 'الدولة الأموية',
+      description: 'قصة الدولة الأموية، واتساع رقعة الإسلام، والحضارة الإسلامية',
+      thumbnailUrl: 'https://i.ytimg.com/vi/example31/maxresdefault.jpg',
+      textContent: 'text_umayyad',
+      videoUrl: 'https://www.youtube.com/watch?v=VIDEO_ID',
+      category: StoryCategory.states,
+      type: StoryType.both,
+      duration: '35 دقيقة',
+      tags: ['دول', 'أمويون', 'حضارة'],
+      heroName: 'بنو أمية',
+    ),
+    Story(
+      id: '32',
+      title: 'الدولة العباسية',
+      description: 'قصة الدولة العباسية، وعصر الذهب الإسلامي، والعلم والعلماء',
+      thumbnailUrl: 'https://i.ytimg.com/vi/example32/maxresdefault.jpg',
+      textContent: 'text_abbasid',
+      videoUrl: 'https://www.youtube.com/watch?v=VIDEO_ID',
+      category: StoryCategory.states,
+      type: StoryType.both,
+      duration: '38 دقيقة',
+      tags: ['دول', 'عباسيون', 'علم'],
+      heroName: 'بنو العباس',
+    ),
+    Story(
+      id: '33',
+      title: 'الدولة العثمانية',
+      description: 'قصة الدولة العثمانية، وخلافة المسلمين لأكثر من 400 عام',
+      thumbnailUrl: 'https://i.ytimg.com/vi/example33/maxresdefault.jpg',
+      textContent: 'text_ottoman',
+      videoUrl: 'https://www.youtube.com/watch?v=VIDEO_ID',
+      category: StoryCategory.states,
+      type: StoryType.both,
+      duration: '45 دقيقة',
+      tags: ['دول', 'عثمانيون', 'خلافة'],
+      heroName: 'العثمانيون',
+    ),
+    Story(
+      id: '34',
+      title: 'دولة الأندلس',
+      description: 'قصة دولة الأندلس، وعصر الحضارة الإسلامية في أوروبا',
+      thumbnailUrl: 'https://i.ytimg.com/vi/example34/maxresdefault.jpg',
+      textContent: 'text_alandalus',
+      videoUrl: 'https://www.youtube.com/watch?v=VIDEO_ID',
+      category: StoryCategory.states,
+      type: StoryType.both,
+      duration: '42 دقيقة',
+      tags: ['دول', 'أندلس', 'حضارة'],
+      heroName: 'مسلمو الأندلس',
+    ),
+
+    // ==========================================
+    // === قصص للأطفال ===
+    // ==========================================
+    Story(
+      id: '35',
+      title: 'قصة أصحاب الفيل',
+      description: 'قصة أصحاب الفيل وكيف أرسل الله عليهم طيراً أبابيل',
+      thumbnailUrl: 'https://i.ytimg.com/vi/example35/maxresdefault.jpg',
+      textContent: 'text_elephant',
+      videoUrl: 'https://www.youtube.com/watch?v=VIDEO_ID',
+      category: StoryCategory.children,
+      type: StoryType.both,
+      duration: '10 دقائق',
+      tags: ['أطفال', 'معجزات', 'قصيرة'],
+    ),
+    Story(
+      id: '36',
+      title: 'قصة الغلام والساحر',
+      description: 'قصة الغلام المؤمن مع الساحر والراهب من قصة أصحاب الأخدود',
+      thumbnailUrl: 'https://i.ytimg.com/vi/example36/maxresdefault.jpg',
+      textContent: 'text_boy',
+      videoUrl: 'https://www.youtube.com/watch?v=VIDEO_ID',
+      category: StoryCategory.children,
+      type: StoryType.both,
+      duration: '12 دقيقة',
+      tags: ['أطفال', 'إيمان', 'قصيرة'],
+    ),
+    Story(
+      id: '37',
+      title: 'قصة أصحاب الأخدود',
+      description: 'قصة المؤمنين الذين صبروا على التعذيب في الأخاديد',
+      thumbnailUrl: 'https://i.ytimg.com/vi/example37/maxresdefault.jpg',
+      textContent: 'text_ukhdood',
+      videoUrl: 'https://www.youtube.com/watch?v=VIDEO_ID',
+      category: StoryCategory.children,
+      type: StoryType.both,
+      duration: '18 دقيقة',
+      tags: ['أطفال', 'إيمان', 'صبر'],
+    ),
+
+    // ==========================================
+    // === قصص عامة ===
+    // ==========================================
+    Story(
+      id: '38',
+      title: 'قصة التائبين',
+      description: 'قصص مؤثرة عن التائبين الذين تاب الله عليهم',
+      thumbnailUrl: 'https://i.ytimg.com/vi/example38/maxresdefault.jpg',
+      textContent: 'text_repenters',
+      videoUrl: 'https://www.youtube.com/watch?v=VIDEO_ID',
+      category: StoryCategory.general,
+      type: StoryType.both,
+      duration: '20 دقيقة',
+      tags: ['توبة', 'عبرة'],
+    ),
+    Story(
+      id: '39',
+      title: 'قصص من رمضان',
+      description: 'قصص مؤثرة من شهر رمضان المبارك',
+      thumbnailUrl: 'https://i.ytimg.com/vi/example39/maxresdefault.jpg',
+      textContent: 'text_ramadan',
+      videoUrl: 'https://www.youtube.com/watch?v=VIDEO_ID',
+      category: StoryCategory.general,
+      type: StoryType.both,
+      duration: '22 دقيقة',
+      tags: ['رمضان', 'عبرة'],
+    ),
+  ];
+
+  static List<Story> getStoriesByCategory(StoryCategory category) {
+    return stories.where((s) => s.category == category).toList();
+  }
+
+  static List<String> getCategories() {
+    return [
+      'الكل',
+      'الأنبياء',
+      'الصحابة',
+      'الأبطال',
+      'الغزوات',
+      'الفتوحات',
+      'الدول',
+      'للأطفال',
+      'قصص عامة'
+    ];
+  }
+
+  static StoryCategory getCategoryFromString(String category) {
+    switch (category) {
+      case 'الأنبياء': return StoryCategory.prophets;
+      case 'الصحابة': return StoryCategory.companions;
+      case 'الأبطال': return StoryCategory.heroes;
+      case 'الغزوات': return StoryCategory.battles;
+      case 'الفتوحات': return StoryCategory.conquests;
+      case 'الدول': return StoryCategory.states;
+      case 'للأطفال': return StoryCategory.children;
+      case 'قصص عامة': return StoryCategory.general;
+      default: return StoryCategory.general;
+    }
+  }
+}

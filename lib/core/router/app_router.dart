@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../features/stories/screens/stories_screen.dart';
 import '../../features/calendar/screens/calendar_screen.dart';
 import '../../features/zakat/screens/zakat_screen.dart';
 import '../../features/asma_allah/screens/asma_allah_screen.dart';
@@ -21,6 +22,11 @@ class AppRouter {
   static final GoRouter router = GoRouter(
     initialLocation: '/',
     routes: [
+      GoRoute(
+        path: '/stories',
+        name: 'stories',
+        builder: (context, state) => const StoriesScreen(),
+      ),
       GoRoute(
         path: '/calendar',
         name: 'calendar',
