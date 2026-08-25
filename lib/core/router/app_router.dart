@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+
+import '../../features/dua/screens/dua_screen.dart';
 import '../../features/stories/screens/stories_screen.dart';
 import '../../features/calendar/screens/calendar_screen.dart';
 import '../../features/zakat/screens/zakat_screen.dart';
@@ -23,6 +25,16 @@ class AppRouter {
     initialLocation: '/',
     routes: [
       GoRoute(
+        path: '/',
+        name: 'home',
+        builder: (context, state) => const HomeScreen(),
+      ),
+      GoRoute(
+        path: '/duas',  // تم التغيير من /dua إلى /duas
+        name: 'dua',
+        builder: (context, state) => const DuaScreen(),
+      ),
+      GoRoute(
         path: '/stories',
         name: 'stories',
         builder: (context, state) => const StoriesScreen(),
@@ -41,11 +53,6 @@ class AppRouter {
         path: '/asma-allah',
         name: 'asmaAllah',
         builder: (context, state) => const AsmaAllahScreen(),
-      ),
-      GoRoute(
-        path: '/',
-        name: 'home',
-        builder: (context, state) => const HomeScreen(),
       ),
       GoRoute(
         path: '/quran',
