@@ -10,7 +10,7 @@ import '../../features/qibla/screens/qibla_screen.dart';
 import '../../features/muhasaba/muhasaba_screen.dart';
 import '../../features/podcast/screens/podcast_screen.dart';
 import '../../features/lectures/screens/lecture_screen.dart';
-import '../../features/books/books_screen.dart';
+import '../../features/books/screens/book_screen.dart';
 import '../../features/radio/screens/radio_screen.dart';
 import '../../features/contact/contact_screen.dart';
 
@@ -71,7 +71,7 @@ class AppRouter {
       GoRoute(
         path: '/books',
         name: 'books',
-        builder: (context, state) => const BooksScreen(),
+        builder: (context, state) => const BookScreen(),
       ),
       GoRoute(
         path: '/radio',
