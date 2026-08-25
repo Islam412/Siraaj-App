@@ -22,6 +22,25 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
   final List<String> _weekDays = ['السبت', 'الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة'];
 
+  // المناسبات الإسلامية
+  final Map<String, Map<String, dynamic>> _islamicEvents = {
+    '1-1': {'name': 'رأس السنة الهجرية', 'icon': Icons.celebration},
+    '10-1': {'name': 'يوم عاشوراء', 'icon': Icons.water_drop},
+    '12-3': {'name': 'المولد النبوي', 'icon': Icons.star},
+    '27-7': {'name': 'الإسراء والمعراج', 'icon': Icons.nights_stay},
+    '15-8': {'name': 'نصف شعبان', 'icon': Icons.brightness_3},
+    '1-9': {'name': 'بداية رمضان', 'icon': Icons.bedtime},
+    '27-9': {'name': 'ليلة القدر', 'icon': Icons.auto_awesome},
+    '1-10': {'name': 'عيد الفطر المبارك', 'icon': Icons.card_giftcard},
+    '2-10': {'name': 'ثاني أيام العيد', 'icon': Icons.card_giftcard},
+    '3-10': {'name': 'ثالث أيام العيد', 'icon': Icons.card_giftcard},
+    '9-12': {'name': 'يوم عرفة', 'icon': Icons.terrain},
+    '10-12': {'name': 'عيد الأضحى المبارك', 'icon': Icons.local_dining},
+    '11-12': {'name': 'ثاني أيام الأضحى', 'icon': Icons.local_dining},
+    '12-12': {'name': 'ثالث أيام الأضحى', 'icon': Icons.local_dining},
+    '13-12': {'name': 'رابع أيام الأضحى', 'icon': Icons.local_dining},
+  };
+
   @override
   void initState() {
     super.initState();
@@ -30,28 +49,21 @@ class _CalendarScreenState extends State<CalendarScreen> {
     _currentHijriDate = HijriCalendar.now();
   }
 
-  // دالة للحصول على أيام الشهر الحالي مع تواريخها الهجرية والميلادية
   List<Map<String, dynamic>> _getMonthDays() {
     List<Map<String, dynamic>> days = [];
     int year = _currentDate.year;
     int month = _currentDate.month;
     
-    // أول يوم في الشهر
     DateTime firstDay = DateTime(year, month, 1);
-    // آخر يوم في الشهر
     DateTime lastDay = DateTime(year, month + 1, 0);
     
-    // يوم الأسبوع لأول يوم (0 = الاثنين في Dart، نحتاج تعديله ليبدأ من السبت)
-    int startWeekday = firstDay.weekday; 
-    // تحويل يوم الأسبوع ليبدأ من السبت (6) إلى الجمعة (5)
-    int adjustedStart = (startWeekday + 1) % 7; 
+    int startWeekday = firstDay.weekday;
+    int adjustedStart = (startWeekday + 1) % 7;
 
-    // إضافة أيام فارغة في البداية
     for (int i = 0; i < adjustedStart; i++) {
-      days.add({'gregorian': '', 'hijri': '', 'isToday': false, 'isEmpty': true});
+      days.add({'gregorian': '', 'hijri': '', 'isToday': false, 'isEmpty': true, 'event': null});
     }
 
-    // إضافة أيام الشهر
     for (int i = 1; i <= lastDay.day; i++) {
       DateTime currentDay = DateTime(year, month, i);
       HijriCalendar hDate = HijriCalendar.fromDate(currentDay);
@@ -60,12 +72,18 @@ class _CalendarScreenState extends State<CalendarScreen> {
                      currentDay.month == DateTime.now().month && 
                      currentDay.year == DateTime.now().year;
 
+      // التحقق من وجود مناسبة
+      String eventKey = '${hDate.hDay}-${hDate.hMonth}';
+      var eventData = _islamicEvents[eventKey];
+
       days.add({
         'gregorian': i.toString(),
         'hijri': hDate.hDay.toString(),
         'hijriMonth': hDate.hMonth,
+        'hijriDay': hDate.hDay,
         'isToday': isToday,
         'isEmpty': false,
+        'event': eventData,
       });
     }
 
@@ -100,11 +118,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            // بطاقة التاريخ الحالي (مزدوج)
             _buildTodayCard(),
             const SizedBox(height: 24),
 
-            // رأس التقويم (الشهر والسنة)
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -142,7 +158,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
             ),
             const SizedBox(height: 16),
 
-            // أيام الأسبوع
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: _weekDays.map((day) => Expanded(
@@ -156,7 +171,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
             ),
             const SizedBox(height: 12),
 
-            // شبكة الأيام
             GridView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
@@ -175,7 +189,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
             
             const SizedBox(height: 24),
             
-            // مناسبات قادمة (ثابتة كمثال)
             _buildUpcomingEvents(),
           ],
         ),
@@ -184,6 +197,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
   }
 
   Widget _buildTodayCard() {
+    // التحقق من مناسبة اليوم
+    String todayKey = '${_currentHijriDate.hDay}-${_currentHijriDate.hMonth}';
+    var todayEvent = _islamicEvents[todayKey];
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(24),
@@ -204,7 +221,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
       ),
       child: Column(
         children: [
-          // التاريخ الهجري (كبير)
           Text(
             '${_currentHijriDate.hDay} ${_hijriMonths[_currentHijriDate.hMonth - 1]} ${_currentHijriDate.hYear}هـ',
             style: GoogleFonts.amiri(
@@ -215,9 +231,29 @@ class _CalendarScreenState extends State<CalendarScreen> {
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 8),
+          if (todayEvent != null) ...[
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(todayEvent['icon'] as IconData, color: const Color(0xFFB8922A), size: 18),
+                  const SizedBox(width: 6),
+                  Text(
+                    todayEvent['name'] as String,
+                    style: GoogleFonts.amiri(fontSize: 14, color: Colors.white, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 8),
+          ],
           const Icon(Icons.keyboard_arrow_down, color: Colors.white70, size: 20),
           const SizedBox(height: 8),
-          // التاريخ الميلادي (أصغر)
           Text(
             DateFormat('EEEE, d MMMM yyyy', 'ar').format(_currentDate),
             style: GoogleFonts.amiri(
@@ -239,6 +275,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
     final isToday = dayData['isToday'] as bool;
     final gregorian = dayData['gregorian'] as String;
     final hijri = dayData['hijri'] as String;
+    final event = dayData['event'] as Map<String, dynamic>?;
 
     return Container(
       decoration: BoxDecoration(
@@ -252,7 +289,19 @@ class _CalendarScreenState extends State<CalendarScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // اليوم الميلادي (كبير)
+          // المناسبة (إن وجدت) - أيقونة صغيرة
+          if (event != null)
+            Icon(
+              event['icon'] as IconData,
+              color: isToday ? Colors.white : const Color(0xFFE91E63),
+              size: 14,
+            )
+          else
+            const SizedBox(height: 14),
+          
+          const SizedBox(height: 2),
+          
+          // اليوم الميلادي
           Text(
             gregorian,
             style: GoogleFonts.amiri(
@@ -261,8 +310,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
               color: isToday ? Colors.white : Colors.white,
             ),
           ),
-          const SizedBox(height: 4),
-          // اليوم الهجري (صغير ومميز)
+          
+          const SizedBox(height: 2),
+          
+          // اليوم الهجري
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
             decoration: BoxDecoration(
@@ -284,6 +335,20 @@ class _CalendarScreenState extends State<CalendarScreen> {
   }
 
   Widget _buildUpcomingEvents() {
+    // حساب المناسبات القادمة في الشهر الحالي
+    List<Map<String, dynamic>> upcomingEvents = [];
+    final monthDays = _getMonthDays();
+    
+    for (var day in monthDays) {
+      if (day['event'] != null) {
+        upcomingEvents.add({
+          'name': day['event']['name'],
+          'date': '${day['hijri']} ${_hijriMonths[_currentHijriDate.hMonth - 1]}',
+          'icon': day['event']['icon'],
+        });
+      }
+    }
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -299,27 +364,37 @@ class _CalendarScreenState extends State<CalendarScreen> {
               const Icon(Icons.event, color: Color(0xFFB8922A), size: 20),
               const SizedBox(width: 8),
               Text(
-                'مناسبات إسلامية قريبة',
+                'مناسبات هذا الشهر',
                 style: GoogleFonts.amiri(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
               ),
             ],
           ),
           const SizedBox(height: 12),
-          _buildEventItem('الإسراء والمعراج', '27 رجب'),
-          _buildEventItem('نصف شعبان', '15 شعبان'),
-          _buildEventItem('بداية رمضان', '1 رمضان'),
+          if (upcomingEvents.isEmpty)
+            Text(
+              'لا توجد مناسبات هذا الشهر',
+              style: GoogleFonts.amiri(fontSize: 14, color: Colors.white54),
+            )
+          else
+            ...upcomingEvents.map((event) => _buildEventItem(event['name'], event['date'], event['icon'])),
         ],
       ),
     );
   }
 
-  Widget _buildEventItem(String title, String date) {
+  Widget _buildEventItem(String title, String date, IconData icon) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(title, style: GoogleFonts.amiri(fontSize: 15, color: Colors.white)),
+          Row(
+            children: [
+              Icon(icon, color: const Color(0xFFB8922A), size: 18),
+              const SizedBox(width: 8),
+              Text(title, style: GoogleFonts.amiri(fontSize: 15, color: Colors.white)),
+            ],
+          ),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
