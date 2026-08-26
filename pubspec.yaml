@@ -9,39 +9,24 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-
-  # Network & API
-  http: ^1.1.0
+  http: ^1.6.0
   dio: ^5.4.0
-
-  # State Management & Routing
   flutter_riverpod: ^2.4.9
   go_router: ^13.0.1
-
-  # Audio
-  audioplayers: ^5.2.1
-
-  # UI & Assets
+  audioplayers: ^6.8.1
   flutter_animate: ^4.5.0
   google_fonts: ^6.1.0
   cached_network_image: ^3.4.1
   flutter_svg: ^2.0.9
-
-  # Local Storage
   hive: ^2.2.3
   hive_flutter: ^1.1.0
   shared_preferences: ^2.2.2
-
-  # Internationalization
   flutter_localizations:
     sdk: flutter
   intl: ^0.20.3
-
-  # Location & Sensors (للقبلة)
   geolocator: ^11.0.0
   sensors_plus: ^5.0.1
   permission_handler: ^11.0.0
-
   adhan: ^2.0.0+1
   timezone: ^0.9.2
   cupertino_icons: ^1.0.6
@@ -64,7 +49,11 @@ flutter:
     - assets/quran/
     - assets/hadith/
     - assets/azkar/
+    - assets/fonts/
 
-  # Prayer Times Calculation
-
-  # Prayer Times Calculation
+  fonts:
+    - family: Amiri
+      fonts:
+        - asset: assets/fonts/Amiri-Regular.ttf
+        - asset: assets/fonts/Amiri-Bold.ttf
+          weight: 700

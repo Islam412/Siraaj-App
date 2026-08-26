@@ -283,7 +283,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       _buildFeatureCard(
                         context,
                         iconPath: 'assets/icons/quran.png',
-                        title: 'القرآن',
+                        title: 'القرآن الكريم',
                         subtitle: 'Quran',
                         iconSize: iconSize,
                         onTap: () => context.push('/quran'),
