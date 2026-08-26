@@ -34,6 +34,8 @@ dependencies:
   syncfusion_flutter_pdfviewer: ^34.2.5
   hijri: ^3.0.1
   record: ^7.1.1
+  speech_to_text: ^7.4.0
+  diff_match_patch: ^0.4.1
 
 dev_dependencies:
   flutter_test:

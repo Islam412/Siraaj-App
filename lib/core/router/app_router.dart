@@ -11,7 +11,7 @@ import '../../features/home/home_screen.dart';
 import '../../features/quran/quran_screen.dart';
 import '../../features/quran_tracker/screens/quran_tracker_screen.dart';
 import '../../features/quran_reader/screens/quran_reader_screen.dart';
-import '../../features/quran_memorization/screens/memorization_screen.dart';
+import '../../features/quran_memorization/screens/smart_memorization_screen.dart'; // <-- تم التحديث هنا
 import '../../features/hadith/screens/hadith_screen.dart';
 import '../../features/azkar/screens/azkar_screen.dart';
 import '../../features/tasbih/screens/tasbih_screen.dart';
@@ -36,7 +36,10 @@ class AppRouter {
       GoRoute(path: '/asma-allah', name: 'asmaAllah', builder: (context, state) => const AsmaAllahScreen()),
       GoRoute(path: '/quran', name: 'quran', builder: (context, state) => const QuranScreen()),
       GoRoute(path: '/quran-reader', name: 'quranReader', builder: (context, state) => const QuranReaderScreen()),
-      GoRoute(path: '/memorization', name: 'memorization', builder: (context, state) => const MemorizationScreen()),
+      
+      // تم تحديث هذا المسار ليستخدم شاشة التسميع الذكي الجديدة
+      GoRoute(path: '/memorization', name: 'memorization', builder: (context, state) => const SmartMemorizationScreen()),
+      
       GoRoute(path: '/quran-tracker', name: 'quranTracker', builder: (context, state) => const QuranTrackerScreen()),
       GoRoute(path: '/qibla', name: 'qibla', builder: (context, state) => const QiblaScreen()),
       GoRoute(path: '/hadith', name: 'hadith', builder: (context, state) => const HadithScreen()),
@@ -49,6 +52,7 @@ class AppRouter {
       GoRoute(path: '/books', name: 'books', builder: (context, state) => const BookScreen()),
       GoRoute(path: '/radio', name: 'radio', builder: (context, state) => const RadioScreen()),
       GoRoute(path: '/contact', name: 'contact', builder: (context, state) => const ContactScreen()),
+      
       // مسارات للشاشات قيد التطوير
       GoRoute(path: '/tafsir', name: 'tafsir', builder: (context, state) => _buildComingSoon('التفسير', Colors.orange)),
       GoRoute(path: '/fadael', name: 'fadael', builder: (context, state) => _buildComingSoon('فضائل السور', Colors.pink)),
