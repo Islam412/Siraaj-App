@@ -13,6 +13,7 @@ import '../../features/quran_tracker/screens/quran_tracker_screen.dart';
 import '../../features/quran_reader/screens/quran_reader_screen.dart';
 import '../../features/quran_memorization/screens/smart_memorization_screen.dart';
 import '../../features/tafsir/screens/tafsir_screen.dart';
+import '../../features/fadael/screens/fadael_screen.dart';
 import '../../features/hadith/screens/hadith_screen.dart';
 import '../../features/azkar/screens/azkar_screen.dart';
 import '../../features/tasbih/screens/tasbih_screen.dart';
@@ -40,6 +41,7 @@ class AppRouter {
       GoRoute(path: '/memorization', name: 'memorization', builder: (context, state) => const SmartMemorizationScreen()),
       GoRoute(path: '/quran-tracker', name: 'quranTracker', builder: (context, state) => const QuranTrackerScreen()),
       GoRoute(path: '/tafsir', name: 'tafsir', builder: (context, state) => const TafsirScreen()),
+      GoRoute(path: '/fadael', name: 'fadael', builder: (context, state) => const FadaelScreen()),
       GoRoute(path: '/qibla', name: 'qibla', builder: (context, state) => const QiblaScreen()),
       GoRoute(path: '/hadith', name: 'hadith', builder: (context, state) => const HadithScreen()),
       GoRoute(path: '/azkar', name: 'azkar', builder: (context, state) => const AzkarScreen()),
@@ -51,7 +53,6 @@ class AppRouter {
       GoRoute(path: '/books', name: 'books', builder: (context, state) => const BookScreen()),
       GoRoute(path: '/radio', name: 'radio', builder: (context, state) => const RadioScreen()),
       GoRoute(path: '/contact', name: 'contact', builder: (context, state) => const ContactScreen()),
-      GoRoute(path: '/fadael', name: 'fadael', builder: (context, state) => _buildComingSoon('فضائل السور', Colors.pink)),
       GoRoute(path: '/tajweed', name: 'tajweed', builder: (context, state) => _buildComingSoon('أحكام التجويد', Colors.cyan)),
     ],
   );
