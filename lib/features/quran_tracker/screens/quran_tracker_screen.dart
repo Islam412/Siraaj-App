@@ -13,14 +13,10 @@ class QuranTrackerScreen extends StatefulWidget {
 
 class _QuranTrackerScreenState extends State<QuranTrackerScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  
-  // متغيرات الحالة
   int _khatamCount = 0;
   int _dailyGoal = 0;
   int _dailyRead = 0;
   String _todayKey = '';
-  
-  // تتبع الحفظ: { "surah_1": {"memorized": true, "tested": false} }
   Map<String, Map<String, bool>> _hifzProgress = {};
 
   @override
@@ -43,7 +39,6 @@ class _QuranTrackerScreenState extends State<QuranTrackerScreen> with SingleTick
       _khatamCount = prefs.getInt('quran_khatam_count') ?? 0;
       _dailyGoal = prefs.getInt('quran_daily_goal') ?? 0;
       _dailyRead = prefs.getInt('quran_daily_read_$_todayKey') ?? 0;
-      
       final hifzData = prefs.getString('quran_hifz_progress');
       if (hifzData != null) {
         _hifzProgress = Map<String, Map<String, bool>>.from(
@@ -91,29 +86,15 @@ class _QuranTrackerScreenState extends State<QuranTrackerScreen> with SingleTick
             Text('ما شاء الله!', style: GoogleFonts.amiri(color: Colors.white, fontWeight: FontWeight.bold)),
           ],
         ),
-        content: Text(
-          'لقد أتممت ورد اليوم بنجاح! هل ترغب في تسجيل ختمة جديدة؟',
-          style: GoogleFonts.amiri(color: Colors.white70),
-        ),
+        content: Text('لقد أتممت ورد اليوم بنجاح! هل ترغب في تسجيل ختمة جديدة؟', style: GoogleFonts.amiri(color: Colors.white70)),
         actions: [
-          TextButton(
-            onPressed: Navigator.of(context).pop,
-            child: Text('لا، شكراً', style: GoogleFonts.amiri(color: Colors.white54)),
-          ),
+          TextButton(onPressed: Navigator.of(context).pop, child: Text('لا، شكراً', style: GoogleFonts.amiri(color: Colors.white54))),
           ElevatedButton(
             onPressed: () {
-              setState(() {
-                _khatamCount++;
-                _dailyRead = 0; // إعادة تعيين لليوم التالي أو يمكن إبقاؤها
-              });
+              setState(() { _khatamCount++; _dailyRead = 0; });
               _saveData();
               Navigator.of(context).pop();
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('تم تسجيل الختمة رقم $_khatamCount! بارك الله فيك', style: GoogleFonts.amiri()),
-                  backgroundColor: Colors.green,
-                ),
-              );
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('تم تسجيل الختمة رقم $_khatamCount!', style: GoogleFonts.amiri()), backgroundColor: Colors.green));
             },
             style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFB8922A)),
             child: Text('نعم، تسجيل ختمة', style: GoogleFonts.amiri(color: Colors.white)),
@@ -125,13 +106,9 @@ class _QuranTrackerScreenState extends State<QuranTrackerScreen> with SingleTick
 
   void _toggleHifzStatus(String surahKey, String status) {
     setState(() {
-      if (_hifzProgress[surahKey] == null) {
-        _hifzProgress[surahKey] = {'memorized': false, 'tested': false};
-      }
+      if (_hifzProgress[surahKey] == null) _hifzProgress[surahKey] = {'memorized': false, 'tested': false};
       _hifzProgress[surahKey]![status] = !(_hifzProgress[surahKey]![status] ?? false);
-      
-      // إذا تم إلغاء الحفظ، إلغاء التسميع تلقائياً
-      if (status == 'memorized' && !_hifzProgress[surahKey]!['memorized']!) {
+      if (status == 'memorized' && !(_hifzProgress[surahKey]!['memorized'] ?? false)) {
         _hifzProgress[surahKey]!['tested'] = false;
       }
     });
@@ -144,12 +121,7 @@ class _QuranTrackerScreenState extends State<QuranTrackerScreen> with SingleTick
       _dailyRead = 0;
     });
     _saveData();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('تم تفعيل خطة: ${plan.name}', style: GoogleFonts.amiri()),
-        backgroundColor: const Color(0xFFB8922A),
-      ),
-    );
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('تم تفعيل خطة: ${plan.name}', style: GoogleFonts.amiri()), backgroundColor: const Color(0xFFB8922A)));
   }
 
   @override
@@ -160,14 +132,11 @@ class _QuranTrackerScreenState extends State<QuranTrackerScreen> with SingleTick
         backgroundColor: const Color(0xFF1E3A5F),
         foregroundColor: Colors.white,
         elevation: 0,
-        title: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.menu_book, color: Color(0xFFB8922A)),
-            const SizedBox(width: 10),
-            Text('متابعة القرآن', style: GoogleFonts.amiri(fontSize: 22, fontWeight: FontWeight.bold)),
-          ],
-        ),
+        title: Row(mainAxisSize: MainAxisSize.min, children: [
+          const Icon(Icons.menu_book, color: Color(0xFFB8922A)),
+          const SizedBox(width: 10),
+          Text('متابعة القرآن', style: GoogleFonts.amiri(fontSize: 22, fontWeight: FontWeight.bold)),
+        ]),
         centerTitle: true,
         bottom: TabBar(
           controller: _tabController,
@@ -175,16 +144,11 @@ class _QuranTrackerScreenState extends State<QuranTrackerScreen> with SingleTick
           labelColor: const Color(0xFFB8922A),
           unselectedLabelColor: Colors.white54,
           labelStyle: GoogleFonts.amiri(fontSize: 16, fontWeight: FontWeight.bold),
-          tabs: const [
-            Tab(text: 'الورد اليومي'),
-            Tab(text: 'الحفظ والتسميع'),
-            Tab(text: 'خطط الختم'),
-          ],
+          tabs: const [Tab(text: 'الورد اليومي'), Tab(text: 'الحفظ والتسميع'), Tab(text: 'خطط الختم')],
         ),
       ),
       body: Column(
         children: [
-          // بطاقة إحصائيات علوية
           Container(
             padding: const EdgeInsets.all(16),
             color: const Color(0xFF132033),
@@ -199,15 +163,10 @@ class _QuranTrackerScreenState extends State<QuranTrackerScreen> with SingleTick
               ],
             ),
           ),
-          
           Expanded(
             child: TabBarView(
               controller: _tabController,
-              children: [
-                _buildWirdTab(),
-                _buildHifzTab(),
-                _buildPlansTab(),
-              ],
+              children: [_buildWirdTab(), _buildHifzTab(), _buildPlansTab()],
             ),
           ),
         ],
@@ -216,19 +175,16 @@ class _QuranTrackerScreenState extends State<QuranTrackerScreen> with SingleTick
   }
 
   Widget _buildStatCard(String label, String value, IconData icon, Color color) {
-    return Column(
-      children: [
-        Icon(icon, color: color, size: 28),
-        const SizedBox(height: 6),
-        Text(value, style: GoogleFonts.amiri(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
-        Text(label, style: GoogleFonts.amiri(fontSize: 12, color: Colors.white54)),
-      ],
-    );
+    return Column(children: [
+      Icon(icon, color: color, size: 28),
+      const SizedBox(height: 6),
+      Text(value, style: GoogleFonts.amiri(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
+      Text(label, style: GoogleFonts.amiri(fontSize: 12, color: Colors.white54)),
+    ]);
   }
 
   Widget _buildWirdTab() {
     double progress = _dailyGoal > 0 ? (_dailyRead / _dailyGoal).clamp(0.0, 1.0) : 0.0;
-    
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Column(
@@ -246,36 +202,25 @@ class _QuranTrackerScreenState extends State<QuranTrackerScreen> with SingleTick
                   alignment: Alignment.center,
                   children: [
                     SizedBox(
-                      width: 150,
-                      height: 150,
+                      width: 150, height: 150,
                       child: CircularProgressIndicator(
-                        value: progress,
-                        strokeWidth: 12,
-                        backgroundColor: Colors.white.withOpacity(0.2),
+                        value: progress, strokeWidth: 12, backgroundColor: Colors.white.withOpacity(0.2),
                         valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFFB8922A)),
                       ),
                     ),
-                    Column(
-                      children: [
-                        Text('$_dailyRead / $_dailyGoal', style: GoogleFonts.amiri(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white)),
-                        Text('صفحة', style: GoogleFonts.amiri(fontSize: 14, color: Colors.white70)),
-                      ],
-                    ),
+                    Column(children: [
+                      Text('$_dailyRead / $_dailyGoal', style: GoogleFonts.amiri(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white)),
+                      Text('صفحة', style: GoogleFonts.amiri(fontSize: 14, color: Colors.white70)),
+                    ]),
                   ],
                 ),
                 const SizedBox(height: 20),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    IconButton(
-                      icon: const Icon(Icons.remove_circle, color: Colors.white, size: 40),
-                      onPressed: _decrementRead,
-                    ),
+                    IconButton(icon: const Icon(Icons.remove_circle, color: Colors.white, size: 40), onPressed: _decrementRead),
                     const SizedBox(width: 30),
-                    IconButton(
-                      icon: const Icon(Icons.add_circle, color: Color(0xFFB8922A), size: 50),
-                      onPressed: _incrementRead,
-                    ),
+                    IconButton(icon: const Icon(Icons.add_circle, color: Color(0xFFB8922A), size: 50), onPressed: _incrementRead),
                   ],
                 ),
               ],
@@ -284,21 +229,12 @@ class _QuranTrackerScreenState extends State<QuranTrackerScreen> with SingleTick
           const SizedBox(height: 20),
           Container(
             padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: const Color(0xFF132033),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: const Color(0xFFB8922A).withOpacity(0.3)),
-            ),
+            decoration: BoxDecoration(color: const Color(0xFF132033), borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFFB8922A).withOpacity(0.3))),
             child: Row(
               children: [
                 const Icon(Icons.info_outline, color: Color(0xFFB8922A)),
                 const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    'اضغط على (+) بعد الانتهاء من قراءة كل صفحة. عند الوصول للهدف، سيظهر لك خيار تسجيل ختمة جديدة.',
-                    style: GoogleFonts.amiri(fontSize: 14, color: Colors.white70, height: 1.6),
-                  ),
-                ),
+                Expanded(child: Text('اضغط على (+) بعد الانتهاء من قراءة كل صفحة. عند الوصول للهدف، سيظهر لك خيار تسجيل ختمة جديدة.', style: GoogleFonts.amiri(fontSize: 14, color: Colors.white70, height: 1.6))),
               ],
             ),
           ),
@@ -324,22 +260,14 @@ class _QuranTrackerScreenState extends State<QuranTrackerScreen> with SingleTick
           decoration: BoxDecoration(
             color: const Color(0xFF132033),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: isTested ? Colors.green.withOpacity(0.5) : (isMemorized ? const Color(0xFFB8922A).withOpacity(0.5) : Colors.white.withOpacity(0.1)),
-            ),
+            border: Border.all(color: isTested ? Colors.green.withOpacity(0.5) : (isMemorized ? const Color(0xFFB8922A).withOpacity(0.5) : Colors.white.withOpacity(0.1))),
           ),
           child: Row(
             children: [
               Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFB8922A).withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Center(
-                  child: Text(surah.number.toString(), style: GoogleFonts.amiri(fontSize: 18, fontWeight: FontWeight.bold, color: const Color(0xFFB8922A))),
-                ),
+                width: 40, height: 40,
+                decoration: BoxDecoration(color: const Color(0xFFB8922A).withOpacity(0.2), borderRadius: BorderRadius.circular(8)),
+                child: Center(child: Text(surah.number.toString(), style: GoogleFonts.amiri(fontSize: 18, fontWeight: FontWeight.bold, color: const Color(0xFFB8922A)))),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -370,11 +298,7 @@ class _QuranTrackerScreenState extends State<QuranTrackerScreen> with SingleTick
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        decoration: BoxDecoration(
-          color: isActive ? color : Colors.transparent,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: color),
-        ),
+        decoration: BoxDecoration(color: isActive ? color : Colors.transparent, borderRadius: BorderRadius.circular(8), border: Border.all(color: color)),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -392,7 +316,7 @@ class _QuranTrackerScreenState extends State<QuranTrackerScreen> with SingleTick
       padding: const EdgeInsets.all(16),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        childAspectRatio: 1.1,
+        childAspectRatio: 0.85,
         crossAxisSpacing: 12,
         mainAxisSpacing: 12,
       ),
@@ -421,10 +345,14 @@ class _QuranTrackerScreenState extends State<QuranTrackerScreen> with SingleTick
                 Icon(Icons.calendar_today, color: isSelected ? Colors.white : const Color(0xFFB8922A), size: 32),
                 const SizedBox(height: 12),
                 Text(plan.name, style: GoogleFonts.amiri(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white), textAlign: TextAlign.center),
+                const SizedBox(height: 12),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(20)),
+                  child: Text('${plan.pagesPerDay} صفحة / يوم', style: GoogleFonts.amiri(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+                ),
                 const SizedBox(height: 8),
-                Text('${plan.pagesPerDay} صفحات / يوم', style: GoogleFonts.amiri(fontSize: 14, color: Colors.white70)),
-                const SizedBox(height: 4),
-                Text(plan.description, style: GoogleFonts.amiri(fontSize: 11, color: Colors.white54), textAlign: TextAlign.center, maxLines: 2),
+                Text(plan.description, style: GoogleFonts.amiri(fontSize: 12, color: Colors.white70), textAlign: TextAlign.center, maxLines: 3),
               ],
             ),
           ),

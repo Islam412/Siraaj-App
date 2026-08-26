@@ -23,39 +23,60 @@ class SurahInfo {
 }
 
 class QuranTrackerData {
-  // خطط الختم المتاحة
+  static const int totalQuranPages = 604;
+
   static const List<KhatamPlan> plans = [
     KhatamPlan(
-      id: '1',
+      id: 'daily',
+      name: 'ختم يومي',
+      durationDays: 1,
+      pagesPerDay: 604,
+      description: 'قراءة 604 صفحة يومياً (ختم كامل يومياً)',
+    ),
+    KhatamPlan(
+      id: 'weekly',
+      name: 'ختم أسبوعي',
+      durationDays: 7,
+      pagesPerDay: 87,
+      description: 'قراءة 87 صفحة يومياً (حوالي 4.5 جزء)',
+    ),
+    KhatamPlan(
+      id: 'bi_monthly',
+      name: 'ختمتين في الشهر',
+      durationDays: 15,
+      pagesPerDay: 41,
+      description: 'قراءة 41 صفحة يومياً (جزئين يومياً)',
+    ),
+    KhatamPlan(
+      id: 'monthly',
       name: 'ختم في شهر',
       durationDays: 30,
-      pagesPerDay: 20, // جزء يومياً
-      description: 'قراءة جزء واحد يومياً (20 صفحة)',
+      pagesPerDay: 20,
+      description: 'قراءة 20 صفحة يومياً (جزء واحد يومياً)',
     ),
     KhatamPlan(
-      id: '2',
+      id: 'two_months',
       name: 'ختم في شهرين',
       durationDays: 60,
-      pagesPerDay: 10, // نصف جزء يومياً
-      description: 'قراءة نصف جزء يومياً (10 صفحات)',
+      pagesPerDay: 11,
+      description: 'قراءة 11 صفحة يومياً (نصف جزء تقريباً)',
     ),
     KhatamPlan(
-      id: '3',
+      id: 'three_months',
       name: 'ختم في 3 أشهر',
       durationDays: 90,
-      pagesPerDay: 7, // تقريباً
+      pagesPerDay: 7,
       description: 'قراءة 7 صفحات يومياً',
     ),
     KhatamPlan(
-      id: '4',
+      id: 'six_months',
       name: 'ختم في 6 أشهر',
       durationDays: 180,
-      pagesPerDay: 3,
-      description: 'قراءة 3 صفحات يومياً (مثالي للمبتدئين)',
+      pagesPerDay: 4,
+      description: 'قراءة 4 صفحات يومياً (مثالي للمبتدئين)',
     ),
   ];
 
-  // قائمة السور لتتبع الحفظ (يمكن توسيعها لتشمل 114 سورة)
   static const List<SurahInfo> surahs = [
     SurahInfo(number: 1, name: 'الفاتحة', ayahCount: 7),
     SurahInfo(number: 2, name: 'البقرة', ayahCount: 286),
